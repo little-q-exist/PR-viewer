@@ -36,3 +36,17 @@
 
 ### 测试
 - 单元测试：Vitest（前端组件）、Jest（后端核心逻辑）
+
+## 约定commit/分支名格式
+commit message 使用中文，分支名使用英文。
+在每个 commit message / 分支名 前必须使用以下后缀描述更改类型：
+- feat
+- refactor
+- docs
+- test
+- fix
+- chore  (依赖/构建/配置相关)
+- style  (与逻辑无关的代码更改)
+如果是 commit message 则前缀尾随半角冒号，分支名则尾随斜杠，例如：
+feat:[commit message]
+feat/[branch name]
