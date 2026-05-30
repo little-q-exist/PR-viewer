@@ -31,8 +31,8 @@ const ReviewSchema = new Schema<IReview>(
       overview: { type: String, required: true },
       recommendations: [
         {
-          priority: { type: String, enum: ['high', 'medium', 'low'] },
-          category: { type: String, enum: ['security', 'performance', 'style', 'logic', 'maintainability'] },
+          priority: { type: String, enum: ['high', 'medium', 'low'], required: true },
+          category: { type: String, enum: ['security', 'performance', 'style', 'logic', 'maintainability'], required: true },
           title: { type: String, required: true },
           description: { type: String, required: true },
         },
@@ -46,10 +46,10 @@ const ReviewSchema = new Schema<IReview>(
         summary: { type: String, required: true },
         suggestions: [
           {
-            lineStart: Number,
+            lineStart: { type: Number, required: true },
             lineEnd: Number,
-            category: { type: String, enum: ['security', 'performance', 'style', 'logic', 'maintainability'] },
-            severity: { type: String, enum: ['critical', 'major', 'minor', 'nit'] },
+            category: { type: String, enum: ['security', 'performance', 'style', 'logic', 'maintainability'], required: true },
+            severity: { type: String, enum: ['critical', 'major', 'minor', 'nit'], required: true },
             title: { type: String, required: true },
             description: { type: String, required: true },
             suggestionCode: String,
