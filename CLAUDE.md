@@ -36,3 +36,13 @@
 
 ### 测试
 - 单元测试：Vitest（前端组件）、Jest（后端核心逻辑）
+
+## 约定commit格式
+在每个 commit message 前必须使用以下后缀描述更改类型：
+- feat:
+- refactor:
+- docs:
+- test:
+- fix:
+- chore:  (依赖/构建/配置相关)
+- style:  (与逻辑无关的代码更改)
