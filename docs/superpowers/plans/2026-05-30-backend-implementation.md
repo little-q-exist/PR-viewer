@@ -71,6 +71,8 @@ backEnd/
 
 ### Task 1: 项目基础设施
 
+**Branch:** `chore/project-infrastructure`
+
 **Files:**
 - Create: `backEnd/tsconfig.json`
 - Create: `backEnd/jest.config.ts`
@@ -78,6 +80,14 @@ backEnd/
 - Create: `backEnd/src/shared/db.ts`
 - Create: `backEnd/src/shared/cache.ts`
 - Create: `backEnd/src/shared/types/index.ts`
+
+- [ ] **Step 0: 创建并切换到新分支**
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b chore/project-infrastructure
+```
 
 - [ ] **Step 1: 创建 tsconfig.json**
 
@@ -325,17 +335,27 @@ Expected: 无错误
 
 ```bash
 git add backEnd/tsconfig.json backEnd/jest.config.ts backEnd/.env.example backEnd/src/shared/
-git commit -m "chore: 添加项目基础设施 - TS配置、Jest配置、DB连接、缓存、类型定义"
+git commit -m "chore:添加项目基础设施 - TS配置、Jest配置、DB连接、缓存、类型定义"
 ```
 
 ---
 
 ### Task 2: Mongoose 模型 — User, PullRequest, Review
 
+**Branch:** `feat/mongoose-models`
+
 **Files:**
 - Create: `backEnd/src/modules/auth/models/User.ts`
 - Create: `backEnd/src/modules/github/models/PullRequest.ts`
 - Create: `backEnd/src/modules/pull-request/models/Review.ts`
+
+- [ ] **Step 0: 创建并切换到新分支**
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b feat/mongoose-models
+```
 
 - [ ] **Step 1: 创建 User 模型**
 
@@ -543,16 +563,26 @@ Expected: 无错误
 
 ```bash
 git add backEnd/src/modules/auth/models/ backEnd/src/modules/github/models/ backEnd/src/modules/pull-request/models/
-git commit -m "feat: 添加 Mongoose 模型 - User, PullRequest, Review"
+git commit -m "feat:添加Mongoose数据模型 - User, PullRequest, Review"
 ```
 
 ---
 
 ### Task 3: 共享中间件 — JWT 认证 & 限流
 
+**Branch:** `feat/shared-middleware`
+
 **Files:**
 - Create: `backEnd/src/shared/middleware/auth.ts`
 - Create: `backEnd/src/shared/middleware/rateLimiter.ts`
+
+- [ ] **Step 0: 创建并切换到新分支**
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b feat/shared-middleware
+```
 
 - [ ] **Step 1: 创建 JWT 认证中间件**
 
@@ -627,17 +657,27 @@ Expected: 无错误
 
 ```bash
 git add backEnd/src/shared/middleware/
-git commit -m "feat: 添加共享中间件 - JWT认证、API限流"
+git commit -m "feat:添加共享中间件 - JWT认证、API限流"
 ```
 
 ---
 
 ### Task 4: Auth 模块 — GitHub App 安装认证
 
+**Branch:** `feat/auth-module`
+
 **Files:**
 - Create: `backEnd/src/modules/auth/services/authService.ts`
 - Create: `backEnd/src/modules/auth/controllers/authController.ts`
 - Create: `backEnd/src/modules/auth/routes.ts`
+
+- [ ] **Step 0: 创建并切换到新分支**
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b feat/auth-module
+```
 
 - [ ] **Step 1: 编写 Auth 模块测试**
 
@@ -830,17 +870,27 @@ Expected: 无错误
 
 ```bash
 git add backEnd/src/modules/auth/
-git commit -m "feat: 添加Auth模块 - GitHub App安装认证、JWT签发与验证"
+git commit -m "feat:添加Auth模块 - GitHub App安装认证、JWT签发与验证"
 ```
 
 ---
 
 ### Task 5: GitHub 模块 — PR 数据拉取与缓存
 
+**Branch:** `feat/github-module`
+
 **Files:**
 - Create: `backEnd/src/modules/github/services/githubService.ts`
 - Create: `backEnd/src/modules/github/controllers/githubController.ts`
 - Create: `backEnd/src/modules/github/routes.ts`
+
+- [ ] **Step 0: 创建并切换到新分支**
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b feat/github-module
+```
 
 - [ ] **Step 1: 编写 githubService 测试**
 
@@ -1130,15 +1180,25 @@ Expected: 无错误
 
 ```bash
 git add backEnd/src/modules/github/
-git commit -m "feat: 添加GitHub模块 - PR数据拉取、三级缓存、URL解析"
+git commit -m "feat:添加GitHub模块 - PR数据拉取、三级缓存、URL解析"
 ```
 
 ---
 
 ### Task 6: Analyzer 模块 — OpenAI 评审分析
 
+**Branch:** `feat/analyzer-module`
+
 **Files:**
 - Create: `backEnd/src/modules/analyzer/services/analyzerService.ts`
+
+- [ ] **Step 0: 创建并切换到新分支**
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b feat/analyzer-module
+```
 
 - [ ] **Step 1: 编写 analyzerService 测试**
 
@@ -1426,17 +1486,27 @@ Expected: 无错误
 
 ```bash
 git add backEnd/src/modules/analyzer/
-git commit -m "feat: 添加Analyzer模块 - OpenAI调用、Prompt构建、JSON响应解析"
+git commit -m "feat:添加Analyzer模块 - OpenAI调用、Prompt构建、JSON响应解析"
 ```
 
 ---
 
 ### Task 7: PullRequest 模块 — Review CRUD 与编排
 
+**Branch:** `feat/pr-module`
+
 **Files:**
 - Create: `backEnd/src/modules/pull-request/services/reviewService.ts`
 - Create: `backEnd/src/modules/pull-request/controllers/reviewController.ts`
 - Create: `backEnd/src/modules/pull-request/routes.ts`
+
+- [ ] **Step 0: 创建并切换到新分支**
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b feat/pr-module
+```
 
 - [ ] **Step 1: 编写 reviewService 测试**
 
@@ -1747,16 +1817,26 @@ Expected: 无错误
 
 ```bash
 git add backEnd/src/modules/pull-request/
-git commit -m "feat: 添加PR模块 - Review创建、列表查询、异步AI分析编排"
+git commit -m "feat:添加PR模块 - Review创建、列表查询、异步AI分析编排"
 ```
 
 ---
 
 ### Task 8: Express App 组装 & 入口文件
 
+**Branch:** `feat/app-entry`
+
 **Files:**
 - Create: `backEnd/src/app.ts`
 - Create: `backEnd/src/server.ts`
+
+- [ ] **Step 0: 创建并切换到新分支**
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b feat/app-entry
+```
 
 - [ ] **Step 1: 创建 app.ts**
 
@@ -1844,16 +1924,26 @@ Expected: 全部测试 PASS
 
 ```bash
 git add backEnd/src/app.ts backEnd/src/server.ts backEnd/package.json backEnd/package-lock.json
-git commit -m "feat: 组装Express应用入口 - 路由注册、全局中间件、错误处理"
+git commit -m "feat:组装Express应用入口 - 路由注册、全局中间件、错误处理"
 ```
 
 ---
 
 ### Task 9: 集成验证 & 最终清理
 
+**Branch:** `chore/integration-verification`
+
 **Files:**
 - Create: `backEnd/.env`
 - Modify: `backEnd/package.json` (更新 scripts)
+
+- [ ] **Step 0: 创建并切换到新分支**
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b chore/integration-verification
+```
 
 - [ ] **Step 1: 更新 package.json scripts**
 
@@ -1889,21 +1979,21 @@ Expected: 覆盖率报告生成
 
 ```bash
 git add backEnd/
-git commit -m "chore: 更新scripts、添加.env配置、编译验证"
+git commit -m "chore:更新scripts、添加.env配置、编译验证"
 ```
 
 ---
 
 ## Summary
 
-| Task | 内容 | 测试 |
-|------|------|------|
-| 1 | 项目基础设施 (tsconfig, jest, types, db, cache) | tsc 编译 |
-| 2 | Mongoose 模型 (User, PullRequest, Review) | tsc 编译 |
-| 3 | 共享中间件 (JWT auth, rate limiter) | tsc 编译 |
-| 4 | Auth 模块 (install, JWT) | 4 tests |
-| 5 | GitHub 模块 (PR拉取, 缓存, URL解析) | 4 tests |
-| 6 | Analyzer 模块 (OpenAI, prompt, 解析) | 4 tests |
-| 7 | PullRequest 模块 (Review CRUD, 编排) | 3 tests |
-| 8 | Express 组装 (app, server, 路由) | 全量回归 |
-| 9 | 集成验证 & 清理 | 编译 + 全量测试 |
+| Task | 分支 | 内容 | 测试 |
+|------|------|------|------|
+| 1 | `chore/project-infrastructure` | 项目基础设施 (tsconfig, jest, types, db, cache) | tsc 编译 |
+| 2 | `feat/mongoose-models` | Mongoose 模型 (User, PullRequest, Review) | tsc 编译 |
+| 3 | `feat/shared-middleware` | 共享中间件 (JWT auth, rate limiter) | tsc 编译 |
+| 4 | `feat/auth-module` | Auth 模块 (install, JWT) | 4 tests |
+| 5 | `feat/github-module` | GitHub 模块 (PR拉取, 缓存, URL解析) | 4 tests |
+| 6 | `feat/analyzer-module` | Analyzer 模块 (OpenAI, prompt, 解析) | 4 tests |
+| 7 | `feat/pr-module` | PullRequest 模块 (Review CRUD, 编排) | 3 tests |
+| 8 | `feat/app-entry` | Express 组装 (app, server, 路由) | 全量回归 |
+| 9 | `chore/integration-verification` | 集成验证 & 清理 | 编译 + 全量测试 |
