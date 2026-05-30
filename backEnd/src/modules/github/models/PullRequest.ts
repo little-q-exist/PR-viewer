@@ -21,7 +21,7 @@ export interface IPullRequest extends Document {
 
 const PullRequestSchema = new Schema<IPullRequest>(
   {
-    url: { type: String, required: true, unique: true, index: true },
+    url: { type: String, required: true, unique: true },
     owner: { type: String, required: true },
     repo: { type: String, required: true },
     pullNumber: { type: Number, required: true },
@@ -35,35 +35,35 @@ const PullRequestSchema = new Schema<IPullRequest>(
     headBranch: { type: String, required: true },
     files: [
       {
-        sha: String,
-        filename: String,
-        status: { type: String, enum: ['added', 'modified', 'removed'] },
-        additions: Number,
-        deletions: Number,
-        changes: Number,
+        sha: { type: String, required: true },
+        filename: { type: String, required: true },
+        status: { type: String, enum: ['added', 'modified', 'removed'], required: true },
+        additions: { type: Number, required: true },
+        deletions: { type: Number, required: true },
+        changes: { type: Number, required: true },
         patch: String,
       },
     ],
     diff: { type: String, required: true },
     commits: [
       {
-        sha: String,
-        message: String,
+        sha: { type: String, required: true },
+        message: { type: String, required: true },
         author: {
-          login: String,
+          login: { type: String, required: true },
           avatarUrl: String,
         },
-        date: Date,
+        date: { type: Date, required: true },
       },
     ],
     comments: [
       {
-        id: Number,
-        body: String,
-        author: { login: String },
+        id: { type: Number, required: true },
+        body: { type: String, required: true },
+        author: { login: { type: String, required: true } },
         path: String,
         line: Number,
-        createdAt: Date,
+        createdAt: { type: Date, required: true },
       },
     ],
     fetchedAt: { type: Date, required: true, index: true },

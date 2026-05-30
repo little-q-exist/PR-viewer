@@ -17,7 +17,7 @@ export interface IReview extends Document {
 
 const ReviewSchema = new Schema<IReview>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     prId: { type: Schema.Types.ObjectId, ref: 'PullRequest', required: true, index: true },
     status: {
       type: String,
@@ -26,42 +26,42 @@ const ReviewSchema = new Schema<IReview>(
       index: true,
     },
     summary: {
-      riskLevel: { type: String, enum: ['low', 'medium', 'high'] },
-      score: { type: Number, min: 0, max: 100 },
-      overview: String,
+      riskLevel: { type: String, enum: ['low', 'medium', 'high'], required: true },
+      score: { type: Number, min: 0, max: 100, required: true },
+      overview: { type: String, required: true },
       recommendations: [
         {
           priority: { type: String, enum: ['high', 'medium', 'low'] },
           category: { type: String, enum: ['security', 'performance', 'style', 'logic', 'maintainability'] },
-          title: String,
-          description: String,
+          title: { type: String, required: true },
+          description: { type: String, required: true },
         },
       ],
     },
     fileAnalyses: [
       {
-        filename: String,
-        status: { type: String, enum: ['added', 'modified', 'removed'] },
-        riskLevel: { type: String, enum: ['low', 'medium', 'high'] },
-        summary: String,
+        filename: { type: String, required: true },
+        status: { type: String, enum: ['added', 'modified', 'removed'], required: true },
+        riskLevel: { type: String, enum: ['low', 'medium', 'high'], required: true },
+        summary: { type: String, required: true },
         suggestions: [
           {
             lineStart: Number,
             lineEnd: Number,
             category: { type: String, enum: ['security', 'performance', 'style', 'logic', 'maintainability'] },
             severity: { type: String, enum: ['critical', 'major', 'minor', 'nit'] },
-            title: String,
-            description: String,
+            title: { type: String, required: true },
+            description: { type: String, required: true },
             suggestionCode: String,
           },
         ],
       },
     ],
     aiUsage: {
-      model: String,
-      promptTokens: Number,
-      completionTokens: Number,
-      totalTokens: Number,
+      model: { type: String, required: true },
+      promptTokens: { type: Number, required: true },
+      completionTokens: { type: Number, required: true },
+      totalTokens: { type: Number, required: true },
       cost: Number,
     },
     errorMessage: String,
