@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import { createOAuthUserAuth } from '@octokit/auth-app';
+import { Octokit } from 'octokit';
 import { User } from '../models/User';
 import { generateToken } from '../services/authService';
 
@@ -11,20 +13,43 @@ export async function install(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    // TODO: Exchange code for GitHub access token via @octokit/oauth-app
-    // For now, create/update user with provided data
+    const clientId = process.env.GITHUB_APP_CLIENT_ID;
+    const clientSecret = process.env.GITHUB_APP_CLIENT_SECRET;
+
+    if (!clientId || !clientSecret) {
+      console.error('GITHUB_APP_CLIENT_ID or GITHUB_APP_CLIENT_SECRET not configured');
+      res.status(500).json({ error: 'Authentication failed' });
+      return;
+    }
+
+    // 1. Exchange the OAuth authorization code for a GitHub access token
+    const auth = createOAuthUserAuth({
+      clientType: 'github-app',
+      clientId,
+      clientSecret,
+      code,
+    });
+
+    const { token: accessToken } = await auth();
+
+    // 2. Fetch the authenticated user's GitHub profile
+    const octokit = new Octokit({ auth: accessToken });
+    const { data: ghUser } = await octokit.rest.users.getAuthenticated();
+
     const githubUser = {
-      githubId: 0, // will be filled by real GitHub API response
-      login: '',   // will be filled by real GitHub API response
-      avatarUrl: '',
+      githubId: ghUser.id,
+      login: ghUser.login,
+      avatarUrl: ghUser.avatar_url,
+      email: ghUser.email ?? undefined,
     };
 
+    // 3. Create or update the user in database
     const user = await User.findOneAndUpdate(
       { githubId: githubUser.githubId },
       {
         ...githubUser,
         installationId,
-        accessToken: 'placeholder-token', // will be real token from GitHub
+        accessToken,
         tokenExpiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000), // 8h
       },
       { upsert: true, new: true },
@@ -41,6 +66,7 @@ export async function install(req: Request, res: Response): Promise<void> {
       },
     });
   } catch (error) {
+    console.error('Auth install error:', error);
     res.status(500).json({ error: 'Authentication failed' });
   }
 }
