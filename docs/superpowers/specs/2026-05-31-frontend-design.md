@@ -8,7 +8,7 @@
 - **框架**: React 19 + TypeScript 6
 - **构建**: Vite 8
 - **路由**: React Router 7
-- **UI 库**: Ant Design 6
+- **UI 库**: Ant Design 6 + @ant-design/icons@6.x
 - **客户端状态**: Redux Toolkit
 - **服务端状态**: TanStack React Query 5
 - **HTTP**: Axios（含 JWT 拦截器）
@@ -79,11 +79,11 @@
 
 **Tab 2 — 具体变更**:
 - 左侧（240px）：文件树列表
-  - 每个文件显示 status 图标（✨ added / 📝 modified / 🗑 removed）
+  - 每个文件显示 status 图标（`<FileAddOutlined />` added / `<FileTextOutlined />` modified / `<DeleteOutlined />` removed），来源 @ant-design/icons
   - 增/删行数统计徽标
 - 右侧：react-diff-viewer 展示当前选中文件的 diff
-  - AI 建议行标注 💬 图标
-  - 点击 💬 → Popover 卡片（毛玻璃背景），展示建议详情
+  - AI 建议行标注 `<MessageOutlined />` 图标（@ant-design/icons）
+  - 点击图标 → Popover 卡片（毛玻璃背景），展示建议详情
   - Popover 内容：严重等级标签、分类、Markdown 描述、建议代码
 
 ---
@@ -266,7 +266,15 @@ frontEnd/
 
 ---
 
-## 九、环境变量
+## 九、实施指导
+
+实施阶段需调用以下技能辅助开发：
+- **ant-design**: 组件选型、主题配置（暗黑模式 + 毛玻璃 token）、图标映射
+- **design-taste-frontend**: 视觉质感审核（间距、色彩、硬件加速、glassmorphism 细节）
+
+---
+
+## 十、环境变量
 
 ```env
 VITE_API_BASE=http://localhost:3000    # 后端 API 地址
