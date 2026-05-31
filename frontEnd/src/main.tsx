@@ -29,6 +29,10 @@ createRoot(document.getElementById('root')!).render(
               borderRadius: 6,
               colorBgContainer: 'rgba(255,255,255,0.04)',
               colorBgElevated: 'rgba(30,30,40,0.95)',
+              colorText: 'rgba(255,255,255,0.85)',
+              colorTextSecondary: 'rgba(255,255,255,0.55)',
+              colorBorder: 'rgba(255,255,255,0.06)',
+              fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
             },
           }}
         >
