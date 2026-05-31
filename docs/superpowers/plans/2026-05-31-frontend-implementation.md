@@ -10,6 +10,49 @@
 
 **Special Skills Required:** ant-design (组件选型/主题/图标), design-taste-frontend (视觉质感审核)
 
+## 分支策略
+
+每个 Phase 开始前从依赖的父分支最新 commit 创建新分支：
+
+```
+main (或当前基线)
+  │
+  └── chore/frontend-scaffold          ← Phase 0
+        │
+        └── feat/frontend-shared-infra  ← Phase 1
+              │
+              ├── feat/frontend-home       ← Phase 2
+              ├── feat/frontend-pr-list    ← Phase 3
+              └── feat/frontend-review     ← Phase 4
+                    │  (Phase 2/3/4 全部完成后合并到 Phase 1 分支)
+                    │
+                    └── feat/frontend-integration  ← Phase 5
+                          │
+                          └── style/frontend-polish       ← Phase 6
+```
+
+**创建分支命令格式：**
+```bash
+# Phase 0: 从当前基线创建
+git checkout -b chore/frontend-scaffold
+
+# Phase 1: 从 Phase 0 最新 commit 创建
+git checkout -b feat/frontend-shared-infra chore/frontend-scaffold
+
+# Phase 2/3/4: 均从 Phase 1 最新 commit 创建（可并行）
+git checkout -b feat/frontend-home feat/frontend-shared-infra
+git checkout -b feat/frontend-pr-list feat/frontend-shared-infra
+git checkout -b feat/frontend-review feat/frontend-shared-infra
+
+# Phase 5: 在 Phase 2/3/4 全部合并回 Phase 1 后，从 Phase 1 创建
+git checkout feat/frontend-shared-infra
+git merge feat/frontend-home feat/frontend-pr-list feat/frontend-review
+git checkout -b feat/frontend-integration feat/frontend-shared-infra
+
+# Phase 6: 从 Phase 5 最新 commit 创建
+git checkout -b style/frontend-polish feat/frontend-integration
+```
+
 ---
 
 ## 文件结构总览
@@ -92,10 +135,18 @@ frontEnd/
 
 ## Phase 0: 项目脚手架
 
+**父分支:** 当前基线 (main 或当前分支)
+
 ### Task 0.1: 更新 package.json 配置
 
 **Files:**
 - Modify: `frontEnd/package.json`
+
+- [ ] **Step 0: 创建 Phase 0 分支**
+
+```bash
+git checkout -b chore/frontend-scaffold
+```
 
 - [ ] **Step 1: 修改 package.json 类型和脚本**
 
@@ -335,6 +386,18 @@ git commit -m "chore:初始化Vite+TypeScript工程配置"
 ---
 
 ## Phase 1: 共享基础设施
+
+**父分支:** `chore/frontend-scaffold` (Phase 0)
+
+### Task 1.0: 创建分支
+
+- [ ] **Step 0: 创建 Phase 1 分支**
+
+```bash
+git checkout -b feat/frontend-shared-infra chore/frontend-scaffold
+```
+
+---
 
 ### Task 1.1: 共享 TypeScript 类型定义
 
@@ -1060,6 +1123,18 @@ git commit -m "feat:实现React Query hooks含3s轮询逻辑"
 
 ## Phase 2: 主页模块
 
+**父分支:** `feat/frontend-shared-infra` (Phase 1)
+
+### Task 2.0: 创建分支
+
+- [ ] **Step 0: 创建 Phase 2 分支**
+
+```bash
+git checkout -b feat/frontend-home feat/frontend-shared-infra
+```
+
+---
+
 ### Task 2.1: WelcomeHero 组件
 
 **Files:**
@@ -1441,6 +1516,18 @@ git commit -m "feat:实现主页Dashboard含统计卡片/PR输入/最近评审"
 
 ## Phase 3: PR 列表模块
 
+**父分支:** `feat/frontend-shared-infra` (Phase 1)
+
+### Task 3.0: 创建分支
+
+- [ ] **Step 0: 创建 Phase 3 分支**
+
+```bash
+git checkout -b feat/frontend-pr-list feat/frontend-shared-infra
+```
+
+---
+
 ### Task 3.1: PRListPage + StatusFilter + ReviewTable
 
 **Files:**
@@ -1685,6 +1772,18 @@ git commit -m "feat:实现PR列表页含状态过滤和分页表格"
 ---
 
 ## Phase 4: 分析报告模块
+
+**父分支:** `feat/frontend-shared-infra` (Phase 1)
+
+### Task 4.0: 创建分支
+
+- [ ] **Step 0: 创建 Phase 4 分支**
+
+```bash
+git checkout -b feat/frontend-review feat/frontend-shared-infra
+```
+
+---
 
 ### Task 4.1: usePolling + useReviewDetail hooks
 
@@ -2495,6 +2594,27 @@ git commit -m "feat:实现变更Tab含文件树/Diff查看器/Popover建议"
 
 ## Phase 5: 集成与路由
 
+**父分支:** `feat/frontend-shared-infra` (Phase 2/3/4 全部合并后)
+
+### Task 5.0: 合并 Phase 2/3/4 并创建分支
+
+- [ ] **Step 0: 切回 Phase 1 并合并 Phase 2/3/4**
+
+```bash
+git checkout feat/frontend-shared-infra
+git merge feat/frontend-home feat/frontend-pr-list feat/frontend-review
+```
+
+处理可能的合并冲突（同一文件不同区域修改通常自动合并）。
+
+- [ ] **Step 0b: 创建 Phase 5 分支**
+
+```bash
+git checkout -b feat/frontend-integration feat/frontend-shared-infra
+```
+
+---
+
 ### Task 5.1: 入口文件 + App 路由 + 全局样式
 
 **Files:**
@@ -2760,6 +2880,18 @@ git commit -m "feat:集成路由/全局样式/入口文件"
 ---
 
 ## Phase 6: 视觉打磨
+
+**父分支:** `feat/frontend-integration` (Phase 5)
+
+### Task 6.0: 创建分支
+
+- [ ] **Step 0: 创建 Phase 6 分支**
+
+```bash
+git checkout -b style/frontend-polish feat/frontend-integration
+```
+
+---
 
 ### Task 6.1: 调用 design-taste-frontend 技能审核
 
