@@ -3,15 +3,10 @@ import { ReloadOutlined } from '@ant-design/icons';
 import { useReviewDetailData } from '../hooks/useReviewDetail';
 import PRInfoBar from './PRInfoBar';
 import PollingIndicator from './PollingIndicator';
-// OverviewTab and ChangesTab will be implemented in Tasks 4.3/4.4
-// For now use simple placeholder content
 import { Typography } from 'antd';
+import OverviewTab from './OverviewTab';
 
 const { Text } = Typography;
-
-function OverviewTabPlaceholder() {
-  return <Text style={{ color: '#888' }}>总览加载中...</Text>;
-}
 
 function ChangesTabPlaceholder() {
   return <Text style={{ color: '#888' }}>变更加载中...</Text>;
@@ -81,7 +76,7 @@ export default function ReviewPage() {
     {
       key: 'overview',
       label: '总览',
-      children: <OverviewTabPlaceholder />,
+      children: <OverviewTab review={review} />,
     },
     {
       key: 'changes',
