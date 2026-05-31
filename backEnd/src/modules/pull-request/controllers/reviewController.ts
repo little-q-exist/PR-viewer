@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { createReview, getReviewById, listReviews, processReview } from '../services/reviewService';
 import { parsePrUrl, getOrFetchPr } from '../../github/services/githubService';
 import { PullRequest } from '../../github/models/PullRequest';
+import { getValidAccessToken } from '../../auth/services/authService';
 
 export async function create(req: Request, res: Response): Promise<void> {
   try {
@@ -19,7 +20,7 @@ export async function create(req: Request, res: Response): Promise<void> {
 
     parsePrUrl(prUrl);
 
-    const accessToken = 'placeholder'; // TODO: get from user's stored token
+    const accessToken = await getValidAccessToken(req.user.userId);
     const prData = await getOrFetchPr(prUrl, accessToken);
 
     const prDoc = await PullRequest.findOne({
