@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { PullRequest } from '../models/PullRequest';
 import { getOrFetchPr, parsePrUrl } from '../services/githubService';
+import { getValidAccessToken } from '../../auth/services/authService';
 
 export async function listPullRequests(req: Request, res: Response): Promise<void> {
   try {
@@ -57,15 +58,24 @@ export async function fetchAndCachePr(req: Request, res: Response): Promise<void
       return;
     }
 
+    if (!req.user) {
+      res.status(401).json({ error: 'Not authenticated' });
+      return;
+    }
+
     parsePrUrl(prUrl);
 
-    const accessToken = 'placeholder'; // TODO: get from authenticated user's stored token
+    const accessToken = await getValidAccessToken(req.user.userId);
     const prData = await getOrFetchPr(prUrl, accessToken);
 
     res.status(200).json(prData);
   } catch (error) {
     if (error instanceof Error && error.message === 'Invalid GitHub PR URL') {
       res.status(400).json({ error: 'Invalid GitHub PR URL' });
+      return;
+    }
+    if (error instanceof Error && error.message.includes('re-authentication required')) {
+      res.status(401).json({ error: 'GitHub authorization expired. Please re-authenticate.' });
       return;
     }
     res.status(500).json({ error: 'Failed to fetch PR data' });
