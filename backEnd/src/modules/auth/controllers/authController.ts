@@ -30,7 +30,14 @@ export async function install(req: Request, res: Response): Promise<void> {
       code,
     });
 
-    const { token: accessToken } = await auth();
+    type OAuthResult = {
+      token: string;
+      expiresAt?: string;
+      refreshToken?: string;
+      refreshTokenExpiresAt?: string;
+    };
+    const authResult = (await auth()) as unknown as OAuthResult;
+    const accessToken = authResult.token;
 
     // 2. Fetch the authenticated user's GitHub profile
     const octokit = new Octokit({ auth: accessToken });
@@ -50,7 +57,10 @@ export async function install(req: Request, res: Response): Promise<void> {
         ...githubUser,
         installationId,
         accessToken,
-        tokenExpiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000), // 8h
+        tokenExpiresAt: authResult.expiresAt
+          ? new Date(authResult.expiresAt)
+          : new Date(Date.now() + 8 * 60 * 60 * 1000),
+        refreshToken: authResult.refreshToken,
       },
       { upsert: true, new: true },
     );
