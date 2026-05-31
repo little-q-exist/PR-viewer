@@ -3,14 +3,8 @@ import { ReloadOutlined } from '@ant-design/icons';
 import { useReviewDetailData } from '../hooks/useReviewDetail';
 import PRInfoBar from './PRInfoBar';
 import PollingIndicator from './PollingIndicator';
-import { Typography } from 'antd';
 import OverviewTab from './OverviewTab';
-
-const { Text } = Typography;
-
-function ChangesTabPlaceholder() {
-  return <Text style={{ color: '#888' }}>变更加载中...</Text>;
-}
+import ChangesTab from './ChangesTab';
 
 export default function ReviewPage() {
   const { review, isLoading, error } = useReviewDetailData();
@@ -81,7 +75,7 @@ export default function ReviewPage() {
     {
       key: 'changes',
       label: '具体变更',
-      children: <ChangesTabPlaceholder />,
+      children: <ChangesTab review={review} />,
     },
   ];
 
