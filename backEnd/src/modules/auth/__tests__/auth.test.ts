@@ -1,4 +1,10 @@
 import jwt from 'jsonwebtoken';
+
+// Mock ESM-only @octokit/auth-app to avoid Jest transform errors
+jest.mock('@octokit/auth-app', () => ({
+  createOAuthUserAuth: jest.fn(),
+}));
+
 import { generateToken, verifyToken } from '../services/authService';
 
 describe('AuthService', () => {
