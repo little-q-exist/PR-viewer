@@ -107,11 +107,11 @@ export async function analyzePullRequest(
   diff: string,
 ): Promise<AnalyzerResult> {
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error('OPENAI_API_KEY is not configured');
+  const model = process.env.OPENAI_MODEL;
+  if (!apiKey || !model) {
+    throw new Error('OPENAI_API_KEY or OPENAI_MODEL is not configured');
   }
 
-  const model = process.env.OPENAI_MODEL || 'gpt-4o';
   const prompt = buildAnalyzerPrompt(prTitle, prBody, files, diff);
 
   const response = await axios.post(
