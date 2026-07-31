@@ -1,20 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
 
+const getElapsedSeconds = (startedAt: string) => Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000);
+
 export function usePolling(startedAt?: string) {
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [elapsedSeconds, setElapsedSeconds] = useState(() => (startedAt ? getElapsedSeconds(startedAt) : 0));
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (!startedAt) return;
+    const updateElapsed = () => {
+      setElapsedSeconds(startedAt ? getElapsedSeconds(startedAt) : 0);
+    };
 
-    const start = new Date(startedAt).getTime();
-    setElapsedSeconds(Math.floor((Date.now() - start) / 1000));
+    const timeoutId = setTimeout(updateElapsed, 0);
 
-    intervalRef.current = setInterval(() => {
-      setElapsedSeconds(Math.floor((Date.now() - start) / 1000));
-    }, 1000);
+    if (startedAt) {
+      intervalRef.current = setInterval(updateElapsed, 1000);
+    }
 
     return () => {
+      clearTimeout(timeoutId);
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [startedAt]);
