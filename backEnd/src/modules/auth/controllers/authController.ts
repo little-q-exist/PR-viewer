@@ -76,7 +76,20 @@ export async function install(req: Request, res: Response): Promise<void> {
       },
     });
   } catch (error) {
-    console.error('Auth install error:', error);
+    const status =
+      typeof error === 'object' && error !== null && 'status' in error
+        ? (error as { status?: unknown }).status
+        : undefined;
+
+    if (status === 400) {
+      // OAuth codes are single-use and short-lived. Avoid logging the complete
+      // Octokit error because it contains sensitive OAuth request details.
+      res.status(400).json({ error: 'GitHub authorization code is invalid or expired. Please try again.' });
+      return;
+    }
+
+    const message = error instanceof Error ? error.message : 'Unknown authentication error';
+    console.error('Auth install error:', { status, message });
     res.status(500).json({ error: 'Authentication failed' });
   }
 }
