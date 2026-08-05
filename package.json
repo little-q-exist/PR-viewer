@@ -1,0 +1,11 @@
+{
+    "name": "prviewer",
+    "private": true,
+    "scripts": {
+        "dev": "concurrently -k -n backend,frontend \"npm --prefix backEnd run dev\" \"npm --prefix frontEnd run dev\"",
+        "start": "npm run dev"
+    },
+    "devDependencies": {
+        "concurrently": "^9.2.1"
+    }
+}
