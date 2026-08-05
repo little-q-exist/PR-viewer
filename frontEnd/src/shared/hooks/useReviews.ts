@@ -53,13 +53,15 @@ export function useAuthUser() {
   });
 }
 
-// GitHub App 安装
+// GitHub App OAuth 登录
 export function useInstall() {
   const dispatch = useDispatch();
 
   return useMutation({
-    mutationFn: ({ installationId, code }: { installationId: number; code: string }) =>
-      authAPI.install(installationId, code).then((res) => res.data),
+    mutationFn: ({ code }: { code: string }) =>
+      authAPI.install(code).then((res) => res.data),
+    // A mutation-level callback still runs if URL replacement causes the
+    // component observer to unsubscribe before the request resolves.
     onSuccess: (data) => {
       dispatch(setAuth({ user: data.user, token: data.token }));
     },
