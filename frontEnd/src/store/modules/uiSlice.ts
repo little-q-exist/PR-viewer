@@ -20,8 +20,11 @@ const uiSlice = createSlice({
     setCurrentReviewId(state, action: PayloadAction<string | null>) {
       state.currentReviewId = action.payload;
     },
+    resetUI() {
+      return initialState;
+    },
   },
 });
 
-export const { setSidebarExpanded, setCurrentReviewId } = uiSlice.actions;
+export const { setSidebarExpanded, setCurrentReviewId, resetUI } = uiSlice.actions;
 export default uiSlice.reducer;

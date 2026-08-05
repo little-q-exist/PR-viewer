@@ -1,13 +1,16 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu } from 'antd';
+import { Button, Menu, Tooltip } from 'antd';
 import {
   HomeOutlined,
   UnorderedListOutlined,
   GithubOutlined,
+  LogoutOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../hooks/useAuth';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSidebarExpanded } from '@/store/modules/uiSlice';
+import { clearAuth } from '@/store/modules/authSlice';
+import { resetUI, setSidebarExpanded } from '@/store/modules/uiSlice';
+import { useQueryClient } from '@tanstack/react-query';
 import type { RootState } from '@/store';
 
 export default function Sidebar() {
@@ -16,6 +19,14 @@ export default function Sidebar() {
   const { isAuthenticated } = useAuth();
   const expanded = useSelector((state: RootState) => state.ui.sidebarExpanded);
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+
+  const handleLogout = () => {
+    dispatch(clearAuth());
+    dispatch(resetUI());
+    queryClient.clear();
+    navigate('/', { replace: true });
+  };
 
   if (!isAuthenticated) return null;
 
@@ -74,6 +85,32 @@ export default function Sidebar() {
         }}
         theme="dark"
       />
+      <div
+        style={{
+          marginTop: 'auto',
+          padding: '8px 8px 16px',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+        }}
+      >
+        <Tooltip title="登出" placement="right" mouseEnterDelay={0.2}>
+          <Button
+            type="text"
+            danger
+            block
+            icon={<LogoutOutlined />}
+            onClick={handleLogout}
+            aria-label="登出"
+            style={{
+              height: 40,
+              justifyContent: expanded ? 'flex-start' : 'center',
+              padding: expanded ? '0 16px' : 0,
+              gap: 10,
+            }}
+          >
+            {expanded && '登出'}
+          </Button>
+        </Tooltip>
+      </div>
     </div>
   );
 }
