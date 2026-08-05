@@ -7,47 +7,64 @@ import LoadingSpinner from '@/shared/components/LoadingSpinner';
 import WelcomeHero from './WelcomeHero';
 import Dashboard from './Dashboard';
 
+const OAUTH_STATE_KEY = 'github-oauth-state';
+
 export default function HomePage() {
   const { isAuthenticated } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { mutate: install } = useInstall();
-  const installationStarted = useRef(false);
-
-  const installationId = searchParams.get('installation_id');
+  const { mutate: install, isPending } = useInstall();
+  const loginStarted = useRef(false);
   const code = searchParams.get('code');
+  const state = searchParams.get('state');
+  const oauthError = searchParams.get('error');
 
   useEffect(() => {
-    if (!installationId || !code || installationStarted.current) {
-      return;
-    }
-
-    const parsedInstallationId = Number(installationId);
-    if (!Number.isSafeInteger(parsedInstallationId) || parsedInstallationId <= 0) {
-      message.error('Invalid GitHub App installation details. Please try again.');
+    if (oauthError) {
+      message.error('GitHub authorization was cancelled or denied.');
       setSearchParams({}, { replace: true });
       return;
     }
 
-    // GitHub OAuth codes are single-use. Remove them before the async request so
+    if (!code || loginStarted.current) {
+      return;
+    }
+
+    const expectedState = sessionStorage.getItem(OAUTH_STATE_KEY);
+    if (!state || state !== expectedState) {
+      message.error('Invalid GitHub sign-in response. Please try again.');
+      setSearchParams({}, { replace: true });
+      return;
+    }
+
+    sessionStorage.removeItem(OAUTH_STATE_KEY);
+    // GitHub OAuth codes are single-use. Remove it before the async request so
     // rerenders cannot submit the same code again.
-    installationStarted.current = true;
+    loginStarted.current = true;
     setSearchParams({}, { replace: true });
 
     install(
-      { installationId: parsedInstallationId, code },
+      { code },
       {
         onSuccess: () => {
           message.success('Signed in successfully.');
         },
-        onError: () => {
-          message.error('GitHub sign-in failed. Please reinstall the app and try again.');
+        onError: (error) => {
+          const status = error instanceof Error && 'response' in error
+            ? (error as { response?: { status?: number } }).response?.status
+            : undefined;
+          message.error(
+            status === 409
+              ? 'Please install the GitHub App first, then sign in again.'
+              : 'GitHub sign-in failed. Please try again.',
+          );
         },
       },
     );
-  }, [code, installationId, install, setSearchParams]);
+  }, [code, install, oauthError, setSearchParams, state]);
 
-  // GitHub 回调中，显示加载状态
-  if (installationId && code) {
+  // Redux authentication controls the page. Do not let a stale mutation
+  // notification keep covering the dashboard after setAuth has succeeded.
+  if (!isAuthenticated && (code || isPending)) {
     return <LoadingSpinner />;
   }
 

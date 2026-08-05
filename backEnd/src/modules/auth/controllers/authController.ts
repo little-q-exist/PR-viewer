@@ -4,44 +4,64 @@ import { Octokit } from 'octokit';
 import { User } from '../models/User';
 import { generateToken } from '../services/authService';
 
+type OAuthResult = {
+  token: string;
+  expiresAt?: string;
+  refreshToken?: string;
+};
+
+function getConfiguredAppId(): number | null {
+  const appId = Number(process.env.GITHUB_APP_ID);
+  return Number.isSafeInteger(appId) && appId > 0 ? appId : null;
+}
+
 export async function install(req: Request, res: Response): Promise<void> {
   try {
-    const { installationId, code } = req.body;
+    const { code } = req.body;
 
-    if (!installationId || !code) {
-      res.status(400).json({ error: 'installationId and code are required' });
+    if (typeof code !== 'string' || !code) {
+      res.status(400).json({ error: 'GitHub authorization code is required' });
       return;
     }
 
     const clientId = process.env.GITHUB_APP_CLIENT_ID;
     const clientSecret = process.env.GITHUB_APP_CLIENT_SECRET;
+    const appId = getConfiguredAppId();
 
-    if (!clientId || !clientSecret) {
-      console.error('GITHUB_APP_CLIENT_ID or GITHUB_APP_CLIENT_SECRET not configured');
+    if (!clientId || !clientSecret || !appId) {
+      console.error('GitHub App OAuth configuration is incomplete');
       res.status(500).json({ error: 'Authentication failed' });
       return;
     }
 
-    // 1. Exchange the OAuth authorization code for a GitHub access token
+    // Exchange the OAuth authorization code for a GitHub user access token.
     const auth = createOAuthUserAuth({
       clientType: 'github-app',
       clientId,
       clientSecret,
       code,
     });
-
-    type OAuthResult = {
-      token: string;
-      expiresAt?: string;
-      refreshToken?: string;
-      refreshTokenExpiresAt?: string;
-    };
     const authResult = (await auth()) as unknown as OAuthResult;
     const accessToken = authResult.token;
-
-    // 2. Fetch the authenticated user's GitHub profile
     const octokit = new Octokit({ auth: accessToken });
-    const { data: ghUser } = await octokit.rest.users.getAuthenticated();
+
+    // The OAuth callback does not contain an installation ID for users who have
+    // already installed the app. Query GitHub instead and only accept an
+    // installation belonging to this app.
+    const [{ data: ghUser }, { data: installations }] = await Promise.all([
+      octokit.rest.users.getAuthenticated(),
+      octokit.rest.apps.listInstallationsForAuthenticatedUser({ per_page: 100 }),
+    ]);
+    const installation = installations.installations.find(
+      (candidate) => candidate.app_id === appId,
+    );
+
+    if (!installation) {
+      res.status(409).json({
+        error: 'GitHub App is not installed for this account. Install the app, then sign in again.',
+      });
+      return;
+    }
 
     const githubUser = {
       githubId: ghUser.id,
@@ -50,12 +70,11 @@ export async function install(req: Request, res: Response): Promise<void> {
       email: ghUser.email ?? undefined,
     };
 
-    // 3. Create or update the user in database
     const user = await User.findOneAndUpdate(
       { githubId: githubUser.githubId },
       {
         ...githubUser,
-        installationId,
+        installationId: installation.id,
         accessToken,
         tokenExpiresAt: authResult.expiresAt
           ? new Date(authResult.expiresAt)
@@ -82,14 +101,12 @@ export async function install(req: Request, res: Response): Promise<void> {
         : undefined;
 
     if (status === 400) {
-      // OAuth codes are single-use and short-lived. Avoid logging the complete
-      // Octokit error because it contains sensitive OAuth request details.
       res.status(400).json({ error: 'GitHub authorization code is invalid or expired. Please try again.' });
       return;
     }
 
     const message = error instanceof Error ? error.message : 'Unknown authentication error';
-    console.error('Auth install error:', { status, message });
+    console.error('Auth login error:', { status, message });
     res.status(500).json({ error: 'Authentication failed' });
   }
 }
@@ -115,7 +132,7 @@ export async function getMe(req: Request, res: Response): Promise<void> {
       avatarUrl: user.avatarUrl,
       email: user.email,
     });
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Failed to fetch user' });
   }
 }
