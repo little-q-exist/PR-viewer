@@ -2,16 +2,19 @@ import axios from 'axios';
 import type { FileInfo, AnalyzerResult } from '../../../shared/types';
 
 export function buildAnalyzerPrompt(
-  prTitle: string,
-  prBody: string | null,
-  files: FileInfo[],
-  diff: string,
+    prTitle: string,
+    prBody: string | null,
+    files: FileInfo[],
+    diff: string,
 ): string {
-  const fileList = files
-    .map((f) => `- ${f.filename} (${f.status}, +${f.additions}/-${f.deletions})`)
-    .join('\n');
+    const fileList = files
+        .map(
+            (f) =>
+                `- ${f.filename} (${f.status}, +${f.additions}/-${f.deletions})`,
+        )
+        .join('\n');
 
-  return `You are a senior code reviewer. Analyze the following Pull Request and produce a structured JSON review.
+    return `You are a senior code reviewer. Analyze the following Pull Request and produce a structured JSON review.
 
 ## PR Title
 ${prTitle}
@@ -77,78 +80,80 @@ Be specific — reference exact line numbers from the diff.`;
 }
 
 export function parseAnalyzerResponse(response: string): AnalyzerResult {
-  let cleaned = response.trim();
+    let cleaned = response.trim();
 
-  const jsonMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if (jsonMatch) {
-    cleaned = jsonMatch[1].trim();
-  }
-
-  try {
-    const parsed = JSON.parse(cleaned);
-
-    if (!parsed.summary || !parsed.fileAnalyses || !parsed.aiUsage) {
-      throw new Error('Missing required fields in AI response');
+    const jsonMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch) {
+        cleaned = jsonMatch[1].trim();
     }
 
-    return parsed as AnalyzerResult;
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      throw new Error('Failed to parse AI response: invalid JSON');
+    try {
+        const parsed = JSON.parse(cleaned);
+
+        if (!parsed.summary || !parsed.fileAnalyses || !parsed.aiUsage) {
+            throw new Error('Missing required fields in AI response');
+        }
+
+        return parsed as AnalyzerResult;
+    } catch (error) {
+        if (error instanceof SyntaxError) {
+            throw new Error('Failed to parse AI response: invalid JSON');
+        }
+        throw error;
     }
-    throw error;
-  }
 }
 
 export async function analyzePullRequest(
-  prTitle: string,
-  prBody: string | null,
-  files: FileInfo[],
-  diff: string,
+    prTitle: string,
+    prBody: string | null,
+    files: FileInfo[],
+    diff: string,
 ): Promise<AnalyzerResult> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_MODEL;
-  if (!apiKey || !model) {
-    throw new Error('OPENAI_API_KEY or OPENAI_MODEL is not configured');
-  }
+    const apiUrl = process.env.OPENAI_API_URL;
+    const apiKey = process.env.OPENAI_API_KEY;
+    const model = process.env.OPENAI_MODEL;
+    if (!apiKey || !model) {
+        throw new Error('OPENAI_API_KEY or OPENAI_MODEL is not configured');
+    }
 
-  const prompt = buildAnalyzerPrompt(prTitle, prBody, files, diff);
+    const prompt = buildAnalyzerPrompt(prTitle, prBody, files, diff);
 
-  const response = await axios.post(
-    'https://api.openai.com/v1/chat/completions',
-    {
-      model,
-      messages: [
+    const response = await axios.post(
+        apiUrl ?? 'https://api.openai.com/v1/chat/completions',
         {
-          role: 'system',
-          content: 'You are a code review expert. Always respond with valid JSON only.',
+            model,
+            messages: [
+                {
+                    role: 'system',
+                    content:
+                        'You are a code review expert. Always respond with valid JSON only.',
+                },
+                { role: 'user', content: prompt },
+            ],
+            temperature: 0.3,
+            max_tokens: 8000,
         },
-        { role: 'user', content: prompt },
-      ],
-      temperature: 0.3,
-      max_tokens: 8000,
-    },
-    {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-    },
-  );
+        {
+            headers: {
+                Authorization: `Bearer ${apiKey}`,
+                'Content-Type': 'application/json',
+            },
+        },
+    );
 
-  const content = response.data.choices?.[0]?.message?.content;
-  if (!content) {
-    throw new Error('Empty response from OpenAI');
-  }
+    const content = response.data.choices?.[0]?.message?.content;
+    if (!content) {
+        throw new Error('Empty response from OpenAI');
+    }
 
-  const result = parseAnalyzerResponse(content);
+    const result = parseAnalyzerResponse(content);
 
-  result.aiUsage = {
-    model,
-    promptTokens: response.data.usage?.prompt_tokens ?? 0,
-    completionTokens: response.data.usage?.completion_tokens ?? 0,
-    totalTokens: response.data.usage?.total_tokens ?? 0,
-  };
+    result.aiUsage = {
+        model,
+        promptTokens: response.data.usage?.prompt_tokens ?? 0,
+        completionTokens: response.data.usage?.completion_tokens ?? 0,
+        totalTokens: response.data.usage?.total_tokens ?? 0,
+    };
 
-  return result;
+    return result;
 }
