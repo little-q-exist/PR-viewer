@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node src/server.ts",
+    "dev": "node --use-system-ca -r ts-node/register src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node --use-system-ca dist/server.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
