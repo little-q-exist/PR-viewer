@@ -1,17 +1,5 @@
 # 当前状态与已知问题
 
-## Git 状态
-
-- 当前分支：`feat/ai-api-url`
-- 最新提交：`f2b48fa feat: 增加可选的AI-API-URL`
-- 本地未提交改动（已从工作区删除，但仍在 git 中）：
-  - `.claude/rules/api-design.md`
-  - `.claude/rules/database.md`
-  - `docs/superpowers/plans/2026-05-30-backend-implementation.md`
-  - `docs/superpowers/plans/2026-05-31-frontend-implementation.md`
-  - `docs/superpowers/specs/2026-05-30-database-design.md`
-  - `docs/superpowers/specs/2026-05-31-frontend-design.md`
-
 ## 已实现功能
 
 ### 后端

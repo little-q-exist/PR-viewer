@@ -50,9 +50,3 @@ npm run dev
 - 后端：`http://localhost:3000`（Express，`npm --prefix backEnd run dev`）
 - 前端：`http://localhost:5173`（Vite，`npm --prefix frontEnd run dev`，`/api` 代理到后端）
 
-## 当前状态速览
-
-- 当前分支：`feat/ai-api-url`
-- 最新提交：`f2b48fa feat: 增加可选的AI-API-URL`
-- 测试：后端 4 个套件 / 15 用例全部通过；前端 2 个文件 / 8 用例全部通过
-- 详见 [current-status.md](./current-status.md)
