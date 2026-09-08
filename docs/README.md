@@ -23,7 +23,7 @@ PRviewer/
 │       ├── store/           # Redux Toolkit（auth / ui）
 │       └── types/           # 前端类型定义
 ├── docs/                    # 项目文档（本目录）
-├── CLAUDE.md                # 项目级约定（背景/技术栈/提交规范）
+├── AGENTS.md                # 项目级约定（入口：先阅读 docs/README.md）
 └── package.json             # 根目录：concurrently 并行启动前后端
 ```
 
@@ -37,7 +37,8 @@ PRviewer/
 | [api.md](./api.md) | REST API 端点说明 |
 | [database.md](./database.md) | 数据模型、索引、ER 关系 |
 | [testing.md](./testing.md) | 测试方案与当前结果 |
-| [configuration.md](./configuration.md) | 环境变量、脚本、工具链、提交规范 |
+| [configuration.md](./configuration.md) | 环境变量、脚本、工具链 |
+| [git-workflow.md](./git-workflow.md) | 代码提交规范：commit 信息、分支命名、gh CLI 推送、PR 与合并流程 |
 | [current-status.md](./current-status.md) | 当前进度、已知问题与待办 |
 
 ## 快速开始

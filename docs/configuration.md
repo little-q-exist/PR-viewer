@@ -56,6 +56,4 @@
 
 ## Git 提交与分支规范
 
-- commit message 使用中文，分支名使用英文。
-- 前缀（commit 后跟半角冒号，分支后跟斜杠）：`feat`、`refactor`、`docs`、`test`、`fix`、`chore`、`style`。
-- 示例：`feat: 增加可选的AI-API-URL` / `feat/ai-api-url`。
+代码提交规范（commit 信息、分支命名、gh CLI 推送、PR 与合并流程）已独立成文：[git-workflow.md](./git-workflow.md)。
