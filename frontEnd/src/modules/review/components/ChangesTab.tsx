@@ -3,6 +3,8 @@ import { Col, Row, Empty } from 'antd';
 import type { Review, FileInfo, FileAnalysis } from '@/types';
 import FileTree from './FileTree';
 import DiffViewer from './DiffViewer';
+import ReviewComments from './ReviewComments';
+import { splitPatchIntoOldNew } from '../utils/splitPatch';
 
 interface ChangesTabProps {
   review: Review;
@@ -16,6 +18,10 @@ export default function ChangesTab({ review }: ChangesTabProps) {
 
   const currentFile = files.find((f) => f.filename === selectedFile);
   const currentAnalysis = fileAnalyses.find((fa) => fa.filename === selectedFile);
+  const fileComments = pr?.comments?.filter((c) => c.path === selectedFile) || [];
+  const { oldCode, newCode } = currentFile
+    ? splitPatchIntoOldNew(currentFile.patch)
+    : { oldCode: '', newCode: '' };
 
   return (
     <Row gutter={20}>
@@ -60,10 +66,11 @@ export default function ChangesTab({ review }: ChangesTabProps) {
                 {currentFile.filename}
               </div>
               <DiffViewer
-                oldCode=""
-                newCode={currentFile.patch || ''}
+                oldCode={oldCode}
+                newCode={newCode}
                 fileAnalysis={currentAnalysis}
               />
+              <ReviewComments comments={fileComments} />
             </>
           ) : (
             <Empty description="选择一个文件查看变更" />

@@ -5,6 +5,18 @@ import type { PrData, ParsedPrUrl } from '../../../shared/types';
 
 const PR_CACHE_TTL = 900; // 15 minutes
 
+// 宽松类型：容纳 pulls.listReviewComments 返回字段（line）与旧 issue
+// comments 返回字段（position）的差异，取数时优先 line、缺失时回退 position。
+type ReviewCommentLike = {
+  id: number;
+  body?: string | null;
+  user?: { login?: string | null } | null;
+  path?: string;
+  line?: number | null;
+  position?: number | null;
+  created_at: string;
+};
+
 export function parsePrUrl(url: string): ParsedPrUrl {
   try {
     const parsed = new URL(url);
@@ -43,12 +55,12 @@ export async function fetchPrFromGitHub(
 ): Promise<PrData> {
   const octokit = createOctokit(accessToken);
 
-  const [{ data: pr }, { data: files }, { data: commits }, { data: comments }] =
+  const [{ data: pr }, { data: files }, { data: commits }, { data: reviewComments }] =
     await Promise.all([
       octokit.rest.pulls.get({ owner, repo, pull_number: pullNumber }),
       octokit.rest.pulls.listFiles({ owner, repo, pull_number: pullNumber, per_page: 100 }),
       octokit.rest.pulls.listCommits({ owner, repo, pull_number: pullNumber, per_page: 100 }),
-      octokit.rest.issues.listComments({ owner, repo, issue_number: pullNumber, per_page: 100 }),
+      octokit.rest.pulls.listReviewComments({ owner, repo, pull_number: pullNumber, per_page: 100 }),
     ]);
 
   const diffResponse = await octokit.request(
@@ -96,14 +108,22 @@ export async function fetchPrFromGitHub(
       },
       date: new Date(c.commit.author?.date ?? Date.now()),
     })),
-    comments: comments.map((c) => ({
-      id: c.id,
-      body: c.body ?? '',
-      author: { login: c.user?.login ?? 'unknown' },
-      path: undefined,
-      line: undefined,
-      createdAt: new Date(c.created_at),
-    })),
+    comments: (reviewComments as unknown as ReviewCommentLike[]).map((c) => {
+      const line =
+        typeof c.line === 'number'
+          ? c.line
+          : typeof c.position === 'number'
+            ? c.position
+            : undefined;
+      return {
+        id: c.id,
+        body: c.body ?? '',
+        author: { login: c.user?.login ?? 'unknown' },
+        path: c.path,
+        line,
+        createdAt: new Date(c.created_at),
+      };
+    }),
   };
 }
 
