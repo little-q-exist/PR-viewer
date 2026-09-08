@@ -70,7 +70,7 @@ backEnd/src/
 ### analyzer —— AI 分析
 - `buildAnalyzerPrompt`：构造“资深代码评审”提示词，要求返回 JSON（summary + fileAnalyses），diff 截断到 80,000 字符。
 - `analyzePullRequest`：调用 OpenAI Chat Completions（可用 `OPENAI_API_URL` 覆盖默认地址），temperature 0.3、max_tokens 8000。
-- `parseAnalyzerResponse`：剥离 Markdown 代码块后 `JSON.parse`，校验 summary/fileAnalyses/aiUsage 三个字段。
+- `parseAnalyzerResponse`：剥离 Markdown 代码块后 `JSON.parse`，校验模型应输出的 summary/fileAnalyses（aiUsage 由调用方在解析后从 API usage 元数据补齐）。
 
 ## shared 公共设施
 

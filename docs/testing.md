@@ -9,12 +9,12 @@
 
 ## 测试文件清单
 
-### 后端（4 套件 / 15 用例）
+### 后端（4 套件 / 16 用例）
 | 文件 | 覆盖内容 |
 |------|----------|
 | `modules/auth/__tests__/auth.test.ts` | generateToken / verifyToken（正常、缺 secret、非法 token） |
 | `modules/github/__tests__/github.test.ts` | parsePrUrl（合法、无尾斜杠、非法域名、非 URL） |
-| `modules/analyzer/__tests__/analyzer.test.ts` | buildAnalyzerPrompt、parseAnalyzerResponse（纯 JSON、Markdown 代码块、非法 JSON） |
+| `modules/analyzer/__tests__/analyzer.test.ts` | buildAnalyzerPrompt、parseAnalyzerResponse（真实模型形状（无 aiUsage）、Markdown 代码块、缺字段、非法 JSON） |
 | `modules/pull-request/__tests__/review.test.ts` | createReview、getReviewById（存在/不存在） |
 
 ### 前端（2 文件 / 8 用例）
@@ -25,7 +25,7 @@
 
 ## 当前结果（实测）
 
-- 后端：`Test Suites: 4 passed`，`Tests: 15 passed`。
+- 后端：`Test Suites: 4 passed`，`Tests: 16 passed`。
 - 前端：`Test Files 2 passed`，`Tests 8 passed`。
 
 ## 备注
