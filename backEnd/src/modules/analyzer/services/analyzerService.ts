@@ -79,7 +79,9 @@ For each changed file, analyze it. Focus on:
 Be specific — reference exact line numbers from the diff.`;
 }
 
-export function parseAnalyzerResponse(response: string): AnalyzerResult {
+export function parseAnalyzerResponse(
+    response: string,
+): Omit<AnalyzerResult, 'aiUsage'> {
     let cleaned = response.trim();
 
     const jsonMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -90,11 +92,11 @@ export function parseAnalyzerResponse(response: string): AnalyzerResult {
     try {
         const parsed = JSON.parse(cleaned);
 
-        if (!parsed.summary || !parsed.fileAnalyses || !parsed.aiUsage) {
+        if (!parsed.summary || !parsed.fileAnalyses) {
             throw new Error('Missing required fields in AI response');
         }
 
-        return parsed as AnalyzerResult;
+        return parsed as Omit<AnalyzerResult, 'aiUsage'>;
     } catch (error) {
         if (error instanceof SyntaxError) {
             throw new Error('Failed to parse AI response: invalid JSON');
@@ -146,14 +148,15 @@ export async function analyzePullRequest(
         throw new Error('Empty response from OpenAI');
     }
 
-    const result = parseAnalyzerResponse(content);
+    const parsed = parseAnalyzerResponse(content);
 
-    result.aiUsage = {
-        model,
-        promptTokens: response.data.usage?.prompt_tokens ?? 0,
-        completionTokens: response.data.usage?.completion_tokens ?? 0,
-        totalTokens: response.data.usage?.total_tokens ?? 0,
+    return {
+        ...parsed,
+        aiUsage: {
+            model,
+            promptTokens: response.data.usage?.prompt_tokens ?? 0,
+            completionTokens: response.data.usage?.completion_tokens ?? 0,
+            totalTokens: response.data.usage?.total_tokens ?? 0,
+        },
     };
-
-    return result;
 }

@@ -29,7 +29,7 @@ describe('analyzerService', () => {
   });
 
   describe('parseAnalyzerResponse', () => {
-    it('should parse valid JSON response', () => {
+    it('should parse a real model response (summary + fileAnalyses only)', () => {
       const jsonResponse = JSON.stringify({
         summary: {
           riskLevel: 'medium',
@@ -61,12 +61,6 @@ describe('analyzerService', () => {
             ],
           },
         ],
-        aiUsage: {
-          model: 'gpt-4o',
-          promptTokens: 500,
-          completionTokens: 200,
-          totalTokens: 700,
-        },
       });
 
       const result = parseAnalyzerResponse(jsonResponse);
@@ -76,17 +70,25 @@ describe('analyzerService', () => {
       expect(result.fileAnalyses).toHaveLength(1);
       expect(result.fileAnalyses[0].filename).toBe('src/login.ts');
       expect(result.fileAnalyses[0].suggestions).toHaveLength(1);
+      expect(result).not.toHaveProperty('aiUsage');
     });
 
     it('should handle JSON wrapped in markdown code blocks', () => {
       const markdownResponse = '```json\n' + JSON.stringify({
         summary: { riskLevel: 'low', score: 90, overview: 'LGTM', recommendations: [] },
         fileAnalyses: [],
-        aiUsage: { model: 'gpt-4o', promptTokens: 100, completionTokens: 50, totalTokens: 150 },
       }) + '\n```';
 
       const result = parseAnalyzerResponse(markdownResponse);
       expect(result.summary.riskLevel).toBe('low');
+    });
+
+    it('should throw when required fields are missing', () => {
+      const incompleteResponse = JSON.stringify({ fileAnalyses: [] });
+
+      expect(() => parseAnalyzerResponse(incompleteResponse)).toThrow(
+        'Missing required fields in AI response',
+      );
     });
 
     it('should throw for unparseable response', () => {

@@ -18,14 +18,16 @@
 
 ## 测试现状
 
-- 后端：15 用例全部通过（auth/github/analyzer/review 的单元测试）。
+- 后端：16 用例全部通过（auth/github/analyzer/review 的单元测试）。
 - 前端：8 用例全部通过（authSlice/uiSlice）。
 - 详见 [testing.md](./testing.md)。
 
 ## 已知问题 / 待办（探索中发现）
 
-### 1. AI 返回解析与提示词不一致（高风险，需确认）
-`analyzerService.parseAnalyzerResponse` 强制要求返回 JSON 中必须含 `summary`、`fileAnalyses`、`aiUsage` 三个字段，但 `buildAnalyzerPrompt` 给模型的结构只有 `summary` 和 `fileAnalyses`，并没有 `aiUsage`（`aiUsage` 是解析后才由代码补上的）。这会导致真实调用时大概率抛 “Missing required fields in AI response”，评审被置为 `failed`。现有单测因手工在输入里带了 `aiUsage` 而未暴露。
+### 1. AI 返回解析与提示词不一致（已修复）
+根因：`aiUsage` 属于 API `usage` 元数据而非模型输出契约，旧校验却强制模型 JSON 含 `aiUsage`，真实调用必抛 “Missing required fields in AI response” 并置评审为 `failed`；旧单测因手工在输入里带 `aiUsage` 而未暴露。
+
+已按方案 A 修复：`parseAnalyzerResponse` 只验收模型应输出的 `summary` / `fileAnalyses`；`aiUsage` 由 `analyzePullRequest` 在解析成功后从 `response.data.usage` 统一补齐。单测已改为真实模型形状（无 aiUsage）并新增缺字段用例。
 
 ### 2. PR 描述（body）未被抓取
 `fetchPrFromGitHub` 只保存了 `pr.title`、分支、文件等，未保存 `pr.body`；`processReview` 调用 `analyzePullRequest` 时 `prBody` 恒为 `null`，因此 AI 提示词里的 “PR Description” 始终是 “No description provided”。
@@ -51,7 +53,7 @@
 
 ## 建议的下一步（按优先级）
 
-1. 修复 `parseAnalyzerResponse` 对 `aiUsage` 的强制校验（在解析后再补 `aiUsage`，或调整提示词）。
+1. ~~修复 `parseAnalyzerResponse` 对 `aiUsage` 的强制校验~~ —— 已完成（见问题 1）。
 2. 抓取并存储 `pr.body`，让 AI 分析使用真实 PR 描述。
 3. 清理未使用依赖与配置（bcrypt、p-limit、GITHUB_APP_PRIVATE_KEY），或补齐对应实现。
 4. 若需要真正的前后代码对比 diff，改造 DiffViewer 的数据来源（例如基于 `patch` 拆分 old/new）。
