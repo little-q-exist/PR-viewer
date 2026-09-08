@@ -47,8 +47,13 @@ export async function create(req: Request, res: Response): Promise<void> {
       prUrl: prData.url,
     });
   } catch (error) {
+    console.error('Failed to create review:', error instanceof Error ? error.message : error);
     if (error instanceof Error && error.message === 'Invalid GitHub PR URL') {
       res.status(400).json({ error: 'Invalid GitHub PR URL' });
+      return;
+    }
+    if (error instanceof Error && error.message.includes('re-authentication required')) {
+      res.status(401).json({ error: 'GitHub authorization expired. Please re-authenticate.' });
       return;
     }
     res.status(500).json({ error: 'Failed to create review' });

@@ -120,21 +120,31 @@ export async function analyzePullRequest(
 
     const prompt = buildAnalyzerPrompt(prTitle, prBody, files, diff);
 
+    const resolvedApiUrl = apiUrl ?? 'https://api.openai.com/v1/chat/completions';
+    const isDeepSeek = resolvedApiUrl.includes('deepseek');
+    const requestBody: Record<string, unknown> = {
+        model,
+        messages: [
+            {
+                role: 'system',
+                content:
+                    'You are a code review expert. Always respond with valid JSON only.',
+            },
+            { role: 'user', content: prompt },
+        ],
+        temperature: 0.3,
+        max_tokens: 8000,
+    };
+    // DeepSeek v4 defaults to thinking mode, which can exhaust max_tokens on
+    // reasoning_content and leave content empty. Disable thinking so the model
+    // emits the requested JSON directly.
+    if (isDeepSeek) {
+        requestBody.thinking = { type: 'disabled' };
+    }
+
     const response = await axios.post(
-        apiUrl ?? 'https://api.openai.com/v1/chat/completions',
-        {
-            model,
-            messages: [
-                {
-                    role: 'system',
-                    content:
-                        'You are a code review expert. Always respond with valid JSON only.',
-                },
-                { role: 'user', content: prompt },
-            ],
-            temperature: 0.3,
-            max_tokens: 8000,
-        },
+        resolvedApiUrl,
+        requestBody,
         {
             headers: {
                 Authorization: `Bearer ${apiKey}`,
@@ -143,7 +153,8 @@ export async function analyzePullRequest(
         },
     );
 
-    const content = response.data.choices?.[0]?.message?.content;
+    const message = response.data.choices?.[0]?.message;
+    const content: string = message?.content || message?.reasoning_content || '';
     if (!content) {
         throw new Error('Empty response from OpenAI');
     }
