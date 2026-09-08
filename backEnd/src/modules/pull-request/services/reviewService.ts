@@ -72,7 +72,7 @@ export async function processReview(reviewId: string, accessToken: string): Prom
 
     const result: AnalyzerResult = await analyzePullRequest(
       pr.title,
-      null,
+      pr.body ?? null,
       pr.files,
       pr.diff,
     );

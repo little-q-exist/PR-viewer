@@ -69,6 +69,7 @@ export async function fetchPrFromGitHub(
     repo,
     pullNumber,
     title: pr.title,
+    body: pr.body ?? '',
     state: pr.state as 'open' | 'closed' | 'merged',
     author: {
       login: pr.user?.login ?? 'unknown',

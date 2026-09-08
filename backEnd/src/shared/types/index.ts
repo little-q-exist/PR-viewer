@@ -44,6 +44,7 @@ export interface PrData {
   repo: string;
   pullNumber: number;
   title: string;
+  body?: string;
   state: 'open' | 'closed' | 'merged';
   author: { login: string; avatarUrl: string };
   baseBranch: string;

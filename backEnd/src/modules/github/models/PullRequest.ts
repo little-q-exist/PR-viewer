@@ -7,6 +7,7 @@ export interface IPullRequest extends Document {
   repo: string;
   pullNumber: number;
   title: string;
+  body?: string;
   state: 'open' | 'closed' | 'merged';
   author: { login: string; avatarUrl: string };
   baseBranch: string;
@@ -26,6 +27,7 @@ const PullRequestSchema = new Schema<IPullRequest>(
     repo: { type: String, required: true },
     pullNumber: { type: Number, required: true },
     title: { type: String, required: true },
+    body: { type: String, default: '' },
     state: { type: String, enum: ['open', 'closed', 'merged'], required: true },
     author: {
       login: { type: String, required: true },
