@@ -15,6 +15,34 @@ export interface IReview extends Document {
   updatedAt: Date;
 }
 
+const SummarySchema = new Schema(
+  {
+    riskLevel: { type: String, enum: ['low', 'medium', 'high'], required: true },
+    score: { type: Number, min: 0, max: 100, required: true },
+    overview: { type: String, required: true },
+    recommendations: [
+      {
+        priority: { type: String, enum: ['high', 'medium', 'low'], required: true },
+        category: { type: String, enum: ['security', 'performance', 'style', 'logic', 'maintainability'], required: true },
+        title: { type: String, required: true },
+        description: { type: String, required: true },
+      },
+    ],
+  },
+  { _id: false },
+);
+
+const AiUsageSchema = new Schema(
+  {
+    model: { type: String, required: true },
+    promptTokens: { type: Number, required: true },
+    completionTokens: { type: Number, required: true },
+    totalTokens: { type: Number, required: true },
+    cost: Number,
+  },
+  { _id: false },
+);
+
 const ReviewSchema = new Schema<IReview>(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -25,19 +53,7 @@ const ReviewSchema = new Schema<IReview>(
       default: 'pending',
       index: true,
     },
-    summary: {
-      riskLevel: { type: String, enum: ['low', 'medium', 'high'], required: true },
-      score: { type: Number, min: 0, max: 100, required: true },
-      overview: { type: String, required: true },
-      recommendations: [
-        {
-          priority: { type: String, enum: ['high', 'medium', 'low'], required: true },
-          category: { type: String, enum: ['security', 'performance', 'style', 'logic', 'maintainability'], required: true },
-          title: { type: String, required: true },
-          description: { type: String, required: true },
-        },
-      ],
-    },
+    summary: { type: SummarySchema, required: false },
     fileAnalyses: [
       {
         filename: { type: String, required: true },
@@ -57,13 +73,7 @@ const ReviewSchema = new Schema<IReview>(
         ],
       },
     ],
-    aiUsage: {
-      model: { type: String, required: true },
-      promptTokens: { type: Number, required: true },
-      completionTokens: { type: Number, required: true },
-      totalTokens: { type: Number, required: true },
-      cost: Number,
-    },
+    aiUsage: { type: AiUsageSchema, required: false },
     errorMessage: String,
     startedAt: Date,
     completedAt: Date,
