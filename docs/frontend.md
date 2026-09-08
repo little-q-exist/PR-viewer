@@ -15,7 +15,7 @@ frontEnd/src/
 ├── modules/
 │   ├── home/          # 首页 = 登录页 + 登录后 Dashboard
 │   ├── pr-list/       # 评审历史列表页
-│   └── review/        # 分析页（总览 / 具体变更）
+│   └── review/        # 分析页（总览 / 具体变更：DiffViewer、ReviewComments、SuggestionPopover）
 ├── shared/
 │   ├── components/    # AppLayout、Sidebar、ProtectedRoute、LoadingSpinner
 │   ├── hooks/         # useAuth、useReviews
@@ -62,7 +62,8 @@ frontEnd/src/
 ### 分析页（review）
 - `ReviewPage`：根据状态展示 `PollingIndicator`、失败 `Result`，或完成后两个 Tab。
 - 总览 Tab（`OverviewTab`）：左侧 `CommitList`，右侧 `AISummary`（风险标签、评分、总体评价、建议列表，Markdown 渲染）。
-- 具体变更 Tab（`ChangesTab`）：左侧 `FileTree`（文件状态/增减行数/风险点），右侧 `DiffViewer` 展示当前文件 patch 与 `SuggestionPopover` 建议列表。
+- 具体变更 Tab（`ChangesTab`）：左侧 `FileTree`（文件状态/增减行数/风险点）；右侧把当前文件 patch 经 `utils/splitPatch.ts` 的 `splitPatchIntoOldNew` 拆成 oldCode/newCode 交给 `DiffViewer`（统一视图 + WORDS 对比），`DiffViewer` 内含 `SuggestionPopover` AI 建议列表。
+- `ChangesTab` 在 `DiffViewer` 下方渲染 `ReviewComments`：展示当前文件的 GitHub 行级评论（按行号升序，点击 Popover 展开作者/行号/Markdown 正文），数据来自 `pr.comments`（按 `path` 过滤）。
 - `PRInfoBar`：PR 标题、作者、base ← head 分支、状态。
 - `usePolling`：排队/分析中的计时显示。
 

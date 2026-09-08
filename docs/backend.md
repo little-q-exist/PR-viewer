@@ -21,19 +21,19 @@ backEnd/src/
 │   │   ├── controllers/authController.ts
 │   │   ├── models/User.ts
 │   │   ├── services/authService.ts
-│   │   └── __tests__/auth.test.ts
+│   │   └── __tests__/（auth.test.ts、auth.controller.test.ts）
 │   ├── github/
 │   │   ├── routes.ts
 │   │   ├── controllers/githubController.ts
 │   │   ├── models/PullRequest.ts
 │   │   ├── services/githubService.ts
-│   │   └── __tests__/github.test.ts
+│   │   └── __tests__/（github.test.ts、github.controller.test.ts）
 │   ├── pull-request/
 │   │   ├── routes.ts
 │   │   ├── controllers/reviewController.ts
 │   │   ├── models/Review.ts
 │   │   ├── services/reviewService.ts
-│   │   └── __tests__/review.test.ts
+│   │   └── __tests__/（review.test.ts、review.controller.test.ts）
 │   └── analyzer/
 │       ├── services/analyzerService.ts
 │       └── __tests__/analyzer.test.ts
@@ -57,14 +57,14 @@ backEnd/src/
 
 ### github —— PR 数据
 - `githubService.parsePrUrl`：解析 `https://github.com/{owner}/{repo}/pull/{number}`。
-- `githubService.fetchPrFromGitHub`：并发拉取 PR 基础信息、files、commits、issue comments，并单独以 `application/vnd.github.v3.diff` 请求完整 diff。
+- `githubService.fetchPrFromGitHub`：并发拉取 PR 基础信息、files、commits 与行级 review comments（`pulls.listReviewComments`，映射 `path` / `line`），并单独以 `application/vnd.github.v3.diff` 请求完整 diff。
 - `githubService.getOrFetchPr`：`node-cache → MongoDB → GitHub API` 三级缓存。
 - `githubController`：列表（不含 diff/commits/comments）、详情、主动 fetch。
 
 ### pull-request —— 评审任务
 - `Review` 模型：userId、prId、status（pending/analyzing/completed/failed）、summary、fileAnalyses、aiUsage、errorMessage、时间戳。
 - `reviewController.create`：校验并缓存 PR → 创建 Review → 异步启动分析 → 返回 `201`。
-- `reviewController.list` / `getById`：分页列表（按状态过滤）与详情（populate 用户与 PR）。
+- `reviewController.list` / `getById`：分页列表（按状态过滤）与详情（populate 用户与 PR；`GET /reviews/:id` 的 PR 额外 populate `comments`，即行级 review comments）。
 - `reviewService.processReview`：置为 `analyzing` → 调 LLM → 写入结果并置 `completed`；异常置 `failed`。
 
 ### analyzer —— AI 分析

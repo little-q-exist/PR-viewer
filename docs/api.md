@@ -41,7 +41,7 @@
 - 返回 PR 列表，字段不含 `diff` / `commits` / `comments`
 
 ### GET `/pull-requests/:id`
-- 返回完整 PullRequest 文档（含 files、diff、commits、comments）
+- 返回完整 PullRequest 文档（含 files、diff、commits、comments）；comments 为 GitHub 行级 review comments（含 path/line）
 - 404：PR 不存在
 
 ### POST `/pull-requests/fetch`
@@ -61,5 +61,5 @@
 - 返回：`{ data: Review[], pagination }`；列表项 populate PR 的标题/URL 等摘要字段，不含 fileAnalyses
 
 ### GET `/reviews/:id`
-- 返回：完整 Review（populate `userId` 的 login/avatarUrl，以及 `prId` 的 title/url/owner/repo/pullNumber/state/files/diff）
+- 返回：完整 Review（populate `userId` 的 login/avatarUrl，以及 `prId` 的 title/url/owner/repo/pullNumber/state/files/diff/comments）
 - 404：Review 不存在

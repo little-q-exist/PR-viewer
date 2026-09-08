@@ -43,7 +43,7 @@ Users (1) ────► (N) Reviews (N) ◄──── (1) PullRequests
 | `files` | [FileInfo] | 是 | 变更文件列表 |
 | `diff` | String | 是 | 完整 diff |
 | `commits` | [CommitInfo] | 是 | commit 列表 |
-| `comments` | [CommentInfo] | 否 | 评论 |
+| `comments` | [CommentInfo] | 否 | GitHub 行级 review comments（含 path/line） |
 | `fetchedAt` | Date | 是 | 拉取时间，普通索引 |
 | `createdAt` | Date | 是 | |
 
@@ -83,5 +83,6 @@ Users (1) ────► (N) Reviews (N) ◄──── (1) PullRequests
 | PullRequests | `fetchedAt` | 普通 | 缓存新鲜度 |
 | Reviews | `prId` | 普通 | PR 的评审历史 |
 | Reviews | `status` | 普通 | 进行中任务 |
+| Reviews | `{ userId, createdAt }` | 普通 | 用户评审列表按时间倒序 |
 
-> 说明：早期数据库设计文档中提到的 `Reviews { userId, createdAt }` 复合索引，当前实现未显式创建（依赖单字段 `userId` 查询 + 内存排序，可按需补充）。
+> 说明：`Reviews { userId, createdAt }` 复合索引已在 `Review.ts` 中通过 `ReviewSchema.index({ userId: 1, createdAt: -1 })` 显式创建，本文档与实现保持一致。
