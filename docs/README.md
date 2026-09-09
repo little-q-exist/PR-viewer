@@ -40,6 +40,8 @@ PRviewer/
 | [configuration.md](./configuration.md) | 环境变量、脚本、工具链 |
 | [git-workflow.md](./git-workflow.md) | 代码提交规范：commit 信息、分支命名、gh CLI 推送、PR 与合并流程 |
 | [current-status.md](./current-status.md) | 当前进度、已知问题与待办 |
+| [plan/README.md](./plan/README.md) | 升级为 harness agent 的开发计划（OCR 路线） |
+| [product/flow.md](./product/flow.md) | PR 输入 → AI 建议 的端到端业务流程 |
 
 ## 快速开始
 
