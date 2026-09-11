@@ -68,4 +68,21 @@ describe('FileTree', () => {
     await user.click(screen.getByText('src/b.ts'));
     expect(onSelect).toHaveBeenCalledWith('src/b.ts');
   });
+
+  it('should show the full filename in a tooltip on hover', async () => {
+    const user = userEvent.setup();
+    const filename = 'src/components/very-long-component-name/with/deep/nesting/index.tsx';
+    render(
+      <FileTree
+        files={[{ ...files[0], filename }]}
+        fileAnalyses={[]}
+        selectedFile={null}
+        onSelectFile={vi.fn()}
+      />,
+    );
+
+    await user.hover(screen.getByText(filename));
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(filename);
+  });
 });
