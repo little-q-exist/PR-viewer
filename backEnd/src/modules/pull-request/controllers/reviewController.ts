@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { createReview, getReviewById, listReviews, processReview } from '../services/reviewService';
-import { parsePrUrl, getOrFetchPr } from '../../github/services/githubService';
+import { getOrFetchPr, parsePrUrl, PrAccessDeniedError } from '../../github/services/githubService';
 import { PullRequest } from '../../github/models/PullRequest';
 import { getValidAccessToken } from '../../auth/services/authService';
 
@@ -56,13 +56,22 @@ export async function create(req: Request, res: Response): Promise<void> {
       res.status(401).json({ error: 'GitHub authorization expired. Please re-authenticate.' });
       return;
     }
+    if (error instanceof PrAccessDeniedError) {
+      res.status(404).json({ error: 'Pull request not found' });
+      return;
+    }
     res.status(500).json({ error: 'Failed to create review' });
   }
 }
 
 export async function getById(req: Request, res: Response): Promise<void> {
   try {
-    const review = await getReviewById(req.params.id as string);
+    if (!req.user) {
+      res.status(401).json({ error: 'Not authenticated' });
+      return;
+    }
+
+    const review = await getReviewById(req.params.id as string, req.user.userId);
     res.status(200).json(review);
   } catch (error) {
     if (error instanceof Error && error.message === 'Review not found') {

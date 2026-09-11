@@ -41,7 +41,7 @@ describe('reviewService', () => {
         summary: { riskLevel: 'low', score: 90 },
       };
 
-      (Review.findById as jest.Mock).mockReturnValue({
+      (Review.findOne as jest.Mock).mockReturnValue({
         populate: jest.fn().mockReturnValue({
           populate: jest.fn().mockReturnValue({
             lean: jest.fn().mockResolvedValue(mockReview),
@@ -49,12 +49,16 @@ describe('reviewService', () => {
         }),
       });
 
-      const result = await getReviewById('review-123');
+      const result = await getReviewById('review-123', 'user-1');
       expect(result).toBeDefined();
+      expect(Review.findOne).toHaveBeenCalledWith({
+        _id: 'review-123',
+        userId: 'user-1',
+      });
     });
 
     it('should throw for non-existent review', async () => {
-      (Review.findById as jest.Mock).mockReturnValue({
+      (Review.findOne as jest.Mock).mockReturnValue({
         populate: jest.fn().mockReturnValue({
           populate: jest.fn().mockReturnValue({
             lean: jest.fn().mockResolvedValue(null),
@@ -62,7 +66,7 @@ describe('reviewService', () => {
         }),
       });
 
-      await expect(getReviewById('nonexistent')).rejects.toThrow('Review not found');
+      await expect(getReviewById('nonexistent', 'user-1')).rejects.toThrow('Review not found');
     });
   });
 });
