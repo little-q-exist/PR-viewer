@@ -25,6 +25,7 @@ jest.mock('../../github/models/PullRequest', () => ({
 jest.mock('../../github/services/githubService', () => ({
   parsePrUrl: jest.fn(),
   getOrFetchPr: jest.fn(),
+  PrAccessDeniedError: class PrAccessDeniedError extends Error {},
 }));
 
 jest.mock('../../auth/services/authService', () => ({
@@ -44,7 +45,7 @@ import request from 'supertest';
 import app from '../../../app';
 import { authMiddleware } from '../../../shared/middleware/auth';
 import { PullRequest } from '../../github/models/PullRequest';
-import { parsePrUrl, getOrFetchPr } from '../../github/services/githubService';
+import { getOrFetchPr, parsePrUrl, PrAccessDeniedError } from '../../github/services/githubService';
 import { getValidAccessToken } from '../../auth/services/authService';
 import { createReview, getReviewById, listReviews, processReview } from '../services/reviewService';
 
@@ -90,6 +91,20 @@ describe('review controller', () => {
       const res = await request(app).post('/reviews').send({});
       expect(res.status).toBe(400);
       expect(res.body.error).toBe('prUrl is required');
+    });
+
+    it('should return 404 when cached PR access is denied', async () => {
+      (parsePrUrl as jest.Mock).mockReturnValue({ owner: 'o', repo: 'r', pullNumber: 1 });
+      (getValidAccessToken as jest.Mock).mockResolvedValue('github-token');
+      (getOrFetchPr as jest.Mock).mockRejectedValue(new PrAccessDeniedError());
+
+      const res = await request(app)
+        .post('/reviews')
+        .send({ prUrl: 'https://github.com/o/r/pull/1' });
+
+      expect(res.status).toBe(404);
+      expect(res.body.error).toBe('Pull request not found');
+      expect(createReview).not.toHaveBeenCalled();
     });
 
     it('should return 500 when PR caching fails', async () => {
@@ -141,7 +156,7 @@ describe('review controller', () => {
       const res = await request(app).get('/reviews/review-1');
       expect(res.status).toBe(200);
       expect(res.body.prId.title).toBe('Fix');
-      expect(getReviewById).toHaveBeenCalledWith('review-1');
+      expect(getReviewById).toHaveBeenCalledWith('review-1', 'user-1');
     });
 
     it('should return 404 when the review does not exist', async () => {

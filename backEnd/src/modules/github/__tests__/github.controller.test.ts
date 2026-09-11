@@ -25,6 +25,7 @@ jest.mock('../models/PullRequest', () => ({
 jest.mock('../services/githubService', () => ({
   parsePrUrl: jest.fn(),
   getOrFetchPr: jest.fn(),
+  PrAccessDeniedError: class PrAccessDeniedError extends Error {},
 }));
 
 jest.mock('../../auth/services/authService', () => ({
@@ -37,7 +38,7 @@ import request from 'supertest';
 import app from '../../../app';
 import { authMiddleware } from '../../../shared/middleware/auth';
 import { PullRequest } from '../models/PullRequest';
-import { parsePrUrl, getOrFetchPr } from '../services/githubService';
+import { getOrFetchPr, parsePrUrl, PrAccessDeniedError } from '../services/githubService';
 import { getValidAccessToken } from '../../auth/services/authService';
 
 type MockRequest = {
@@ -118,6 +119,19 @@ describe('github controller', () => {
       expect(res.status).toBe(200);
       expect(res.body.title).toBe('Fix');
       expect(getOrFetchPr).toHaveBeenCalledWith('https://github.com/o/r/pull/1', 'github-token');
+    });
+
+    it('should return 404 when cached PR access is denied', async () => {
+      (parsePrUrl as jest.Mock).mockReturnValue({ owner: 'o', repo: 'r', pullNumber: 1 });
+      (getValidAccessToken as jest.Mock).mockResolvedValue('github-token');
+      (getOrFetchPr as jest.Mock).mockRejectedValue(new PrAccessDeniedError());
+
+      const res = await request(app)
+        .post('/pull-requests/fetch')
+        .send({ prUrl: 'https://github.com/o/r/pull/1' });
+
+      expect(res.status).toBe(404);
+      expect(res.body.error).toBe('Pull request not found');
     });
 
     it('should return 400 when prUrl is missing', async () => {

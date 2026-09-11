@@ -1,5 +1,5 @@
 import { Octokit } from 'octokit';
-import { getOrSet } from '../../../shared/cache';
+import cache from '../../../shared/cache';
 import { PullRequest } from '../models/PullRequest';
 import type { PrData, ParsedPrUrl } from '../../../shared/types';
 
@@ -16,6 +16,22 @@ type ReviewCommentLike = {
   position?: number | null;
   created_at: string;
 };
+
+export class PrAccessDeniedError extends Error {
+  constructor() {
+    super('Pull request not found or inaccessible');
+    this.name = 'PrAccessDeniedError';
+  }
+}
+
+function isGitHubAccessDenied(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null || !('status' in error)) {
+    return false;
+  }
+
+  const status = (error as { status?: unknown }).status;
+  return status === 403 || status === 404;
+}
 
 export function parsePrUrl(url: string): ParsedPrUrl {
   try {
@@ -127,29 +143,60 @@ export async function fetchPrFromGitHub(
   };
 }
 
+async function assertPrAccess(
+  owner: string,
+  repo: string,
+  pullNumber: number,
+  accessToken: string,
+): Promise<void> {
+  try {
+    const octokit = createOctokit(accessToken);
+    await octokit.rest.pulls.get({ owner, repo, pull_number: pullNumber });
+  } catch (error) {
+    if (isGitHubAccessDenied(error)) {
+      throw new PrAccessDeniedError();
+    }
+    throw error;
+  }
+}
+
 export async function getOrFetchPr(
   prUrl: string,
   accessToken: string,
 ): Promise<PrData> {
   const { owner, repo, pullNumber } = parsePrUrl(prUrl);
-
   const cacheKey = `pr:${owner}:${repo}:${pullNumber}`;
-  const memoryCached = await getOrSet(cacheKey, PR_CACHE_TTL, async () => {
-    const existing = await PullRequest.findOne({ owner, repo, pullNumber });
-    if (existing) {
-      return existing.toObject() as unknown as PrData;
-    }
 
-    const prData = await fetchPrFromGitHub(owner, repo, pullNumber, accessToken);
+  const cached = cache.get<PrData>(cacheKey);
+  if (cached !== undefined) {
+    await assertPrAccess(owner, repo, pullNumber, accessToken);
+    return cached;
+  }
 
-    await PullRequest.findOneAndUpdate(
-      { owner, repo, pullNumber },
-      { ...prData, fetchedAt: new Date() },
-      { upsert: true, new: true },
-    );
-
+  const existing = await PullRequest.findOne({ owner, repo, pullNumber });
+  if (existing) {
+    const prData = existing.toObject() as unknown as PrData;
+    await assertPrAccess(owner, repo, pullNumber, accessToken);
+    cache.set(cacheKey, prData, PR_CACHE_TTL);
     return prData;
-  });
+  }
 
-  return memoryCached;
+  let prData: PrData;
+  try {
+    prData = await fetchPrFromGitHub(owner, repo, pullNumber, accessToken);
+  } catch (error) {
+    if (isGitHubAccessDenied(error)) {
+      throw new PrAccessDeniedError();
+    }
+    throw error;
+  }
+
+  await PullRequest.findOneAndUpdate(
+    { owner, repo, pullNumber },
+    { ...prData, fetchedAt: new Date() },
+    { upsert: true, new: true },
+  );
+
+  cache.set(cacheKey, prData, PR_CACHE_TTL);
+  return prData;
 }

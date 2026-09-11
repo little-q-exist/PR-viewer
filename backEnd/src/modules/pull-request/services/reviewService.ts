@@ -14,8 +14,11 @@ export async function createReview(userId: string, prId: string): Promise<IRevie
   return review;
 }
 
-export async function getReviewById(reviewId: string): Promise<Record<string, unknown>> {
-  const review = await Review.findById(reviewId)
+export async function getReviewById(
+  reviewId: string,
+  userId: string,
+): Promise<Record<string, unknown>> {
+  const review = await Review.findOne({ _id: reviewId, userId })
     .populate('userId', 'login avatarUrl')
     .populate('prId', 'title url owner repo pullNumber state author baseBranch headBranch files diff comments')
     .lean();
