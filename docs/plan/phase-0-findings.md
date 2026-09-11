@@ -343,17 +343,17 @@ spawn(
 );
 ```
 
-全局 npm 安装时入口为：
+当前项目依赖入口为：
 
 ```text
-%APPDATA%\npm\node_modules\@alibaba-group\open-code-review\bin\ocr.js
+backEnd\node_modules\@alibaba-group\open-code-review\bin\ocr.js
 ```
 
-阶段 1 需要先解决入口解析策略，优先级建议：
+阶段 1 通过本地依赖解析入口：
 
-1. 将 OCR 包作为后端本地依赖，使用 `require.resolve` 解析 `bin/ocr.js`。
-2. 或提供显式 `OCR_CLI_ENTRY` 环境变量。
-3. 最后才用 `npm root -g` 探测全局安装。
+1. 使用 `require.resolve('@alibaba-group/open-code-review/bin/ocr.js')` 解析本地入口。
+2. 允许 `OCR_CLI_ENTRY` 作为部署环境覆盖，便于容器或全局安装。
+3. 仅在显式配置缺失时，才回退到 `npm root -g` 探测全局安装。
 
 ### 5.2 其他 Windows 坑
 
