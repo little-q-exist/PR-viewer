@@ -30,6 +30,10 @@
 |------|------|
 | `npm run dev` | concurrently 并行启动后端与前端 |
 | `npm start` | 同 dev |
+| `npm run validate` | 执行提交前完整验证：lint、测试、构建与生产依赖审计 |
+| `npm run validate:frontend` | 前端 lint、测试与构建 |
+| `npm run validate:backend` | 后端测试与构建 |
+| `npm run audit:prod` | 前后端生产依赖 high/critical 审计 |
 
 ### 后端
 | 命令 | 说明 |
@@ -57,3 +61,5 @@
 ## Git 提交与分支规范
 
 代码提交规范（commit 信息、分支命名、gh CLI 推送、PR 与合并流程）已独立成文：[git-workflow.md](./git-workflow.md)。
+
+提交前的本地验证与 CI 流程见 [submission-workflow.md](./submission-workflow.md)。

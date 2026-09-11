@@ -3,7 +3,11 @@
     "private": true,
     "scripts": {
         "dev": "concurrently -k -n backend,frontend \"npm --prefix backEnd run dev\" \"npm --prefix frontEnd run dev\"",
-        "start": "npm run dev"
+        "start": "npm run dev",
+        "validate:frontend": "npm --prefix frontEnd run lint && npm --prefix frontEnd test && npm --prefix frontEnd run build",
+        "validate:backend": "npm --prefix backEnd test && npm --prefix backEnd run build",
+        "audit:prod": "npm --prefix frontEnd audit --omit=dev --audit-level=high && npm --prefix backEnd audit --omit=dev --audit-level=high",
+        "validate": "npm run validate:frontend && npm run validate:backend && npm run audit:prod"
     },
     "devDependencies": {
         "concurrently": "^9.2.1"
