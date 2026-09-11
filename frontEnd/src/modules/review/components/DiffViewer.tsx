@@ -6,10 +6,21 @@ import SuggestionPopover from './SuggestionPopover';
 // react-diff-viewer 是纯 CJS 的旧库：`__esModule = true`，真正的组件挂在 `exports.default`。
 // Vite 8 在 dev 下按 esbuild/Node 语义预打包 CJS 依赖，默认导出是整个 `module.exports`
 // 对象（组件在 `.default`），而生产构建 / vitest / 旧版 Vite 会直接把 default 解包成组件。
-// 统一在这里兼容两种形态，避免 dev 下 React 拿到一个 object 当组件类型（Element type is invalid）。
-const ReactDiffViewerComponent =
-  (ReactDiffViewerModule as unknown as { default?: typeof ReactDiffViewerModule }).default ??
-  ReactDiffViewerModule;
+// 独立导出解析函数，便于用纯单元测试覆盖两种形态，避免测试通过重置模块触发大型依赖重载。
+export function resolveReactDiffViewerComponent(module: unknown): unknown {
+  if (typeof module === 'object' && module !== null && 'default' in module) {
+    const defaultExport = (module as { default?: unknown }).default;
+    if (defaultExport !== undefined && defaultExport !== null) {
+      return defaultExport;
+    }
+  }
+
+  return module;
+}
+
+const ReactDiffViewerComponent = resolveReactDiffViewerComponent(
+  ReactDiffViewerModule,
+) as typeof ReactDiffViewerModule;
 
 interface DiffViewerProps {
   oldCode: string;
