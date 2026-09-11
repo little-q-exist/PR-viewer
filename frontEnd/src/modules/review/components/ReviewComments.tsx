@@ -1,7 +1,7 @@
 import { List, Popover, Tag, Typography } from 'antd';
 import { MessageOutlined } from '@ant-design/icons';
 import type { CommentInfo } from '@/types';
-import { marked } from 'marked';
+import MarkdownContent from '@/shared/components/MarkdownContent';
 
 const { Text } = Typography;
 
@@ -50,9 +50,9 @@ export default function ReviewComments({ comments }: ReviewCommentsProps) {
                       <Tag style={{ marginInlineEnd: 0 }}>第 {comment.line} 行</Tag>
                     )}
                   </div>
-                  <div
+                  <MarkdownContent
+                    content={comment.body}
                     style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, lineHeight: 1.6 }}
-                    dangerouslySetInnerHTML={{ __html: marked.parse(comment.body) as string }}
                   />
                 </div>
               }

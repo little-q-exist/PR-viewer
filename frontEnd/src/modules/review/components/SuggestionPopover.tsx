@@ -1,7 +1,7 @@
 import { Popover, Tag, Typography } from 'antd';
 import { MessageOutlined } from '@ant-design/icons';
 import type { Suggestion } from '@/types';
-import { marked } from 'marked';
+import MarkdownContent from '@/shared/components/MarkdownContent';
 
 const { Text } = Typography;
 
@@ -28,9 +28,9 @@ export default function SuggestionPopover({ suggestion }: SuggestionPopoverProps
       <Text strong style={{ color: '#e0e0e0', display: 'block', marginBottom: 8 }}>
         {suggestion.title}
       </Text>
-      <div
+      <MarkdownContent
+        content={suggestion.description}
         style={{ color: 'rgba(255,255,255,0.75)', fontSize: 13, lineHeight: 1.6 }}
-        dangerouslySetInnerHTML={{ __html: marked.parse(suggestion.description) as string }}
       />
       {suggestion.suggestionCode && (
         <pre style={{

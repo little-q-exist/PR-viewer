@@ -1,14 +1,8 @@
 import { Card, Tag, Typography, List } from 'antd';
-import { marked } from 'marked';
 import type { Summary, Recommendation } from '@/types';
+import MarkdownContent from '@/shared/components/MarkdownContent';
 
 const { Text } = Typography;
-
-// Configure marked with highlight.js
-marked.setOptions({
-  gfm: true,
-  breaks: true,
-});
 
 const riskConfig: Record<string, { color: string; label: string }> = {
   high: { color: '#ff5252', label: '高风险' },
@@ -21,18 +15,6 @@ const priorityConfig: Record<string, { color: string; label: string }> = {
   medium: { color: '#ff9800', label: '中' },
   low: { color: '#4caf50', label: '低' },
 };
-
-function MarkdownContent({ content }: { content: string }) {
-  const html = marked.parse(content) as string;
-
-  return (
-    <div
-      className="markdown-body"
-      style={{ color: 'rgba(255,255,255,0.85)', lineHeight: 1.7 }}
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
-  );
-}
 
 interface AISummaryProps {
   summary: Summary;
@@ -63,7 +45,11 @@ export default function AISummary({ summary }: AISummaryProps) {
           marginBottom: 16,
         }}
       >
-        <MarkdownContent content={summary.overview} />
+        <MarkdownContent
+          content={summary.overview}
+          className="markdown-body"
+          style={{ color: 'rgba(255,255,255,0.85)', lineHeight: 1.7 }}
+        />
       </Card>
 
       {/* Recommendations */}
@@ -88,7 +74,11 @@ export default function AISummary({ summary }: AISummaryProps) {
                   description={
                     <div style={{ marginTop: 4 }}>
                       <Tag style={{ marginBottom: 6 }}>{rec.category}</Tag>
-                      <MarkdownContent content={rec.description} />
+                      <MarkdownContent
+                        content={rec.description}
+                        className="markdown-body"
+                        style={{ color: 'rgba(255,255,255,0.85)', lineHeight: 1.7 }}
+                      />
                     </div>
                   }
                 />
