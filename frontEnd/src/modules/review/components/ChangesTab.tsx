@@ -24,8 +24,8 @@ export default function ChangesTab({ review }: ChangesTabProps) {
     : { oldCode: '', newCode: '' };
 
   return (
-    <Row gutter={20}>
-      <Col flex="240px">
+    <Row gutter={20} wrap={false}>
+      <Col flex="0 0 240px">
         <div style={{
           background: 'rgba(255,255,255,0.03)',
           border: '1px solid rgba(255,255,255,0.06)',
@@ -52,13 +52,15 @@ export default function ChangesTab({ review }: ChangesTabProps) {
           />
         </div>
       </Col>
-      <Col flex="auto">
+      <Col flex="auto" style={{ minWidth: 0 }}>
         <div style={{
           background: 'rgba(255,255,255,0.03)',
           border: '1px solid rgba(255,255,255,0.06)',
           borderRadius: 8,
           padding: 16,
           minHeight: 500,
+          minWidth: 0,
+          overflowX: 'auto',
         }}>
           {currentFile ? (
             <>
