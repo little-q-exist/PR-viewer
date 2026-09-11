@@ -1,4 +1,4 @@
-import { List, Badge } from 'antd';
+import { List, Badge, Tooltip } from 'antd';
 import { FileAddOutlined, FileTextOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { FileInfo, FileAnalysis } from '@/types';
 
@@ -46,43 +46,45 @@ export default function FileTree({ files, fileAnalyses, selectedFile, onSelectFi
         dataSource={files}
         split={false}
         renderItem={(file) => (
-          <List.Item
-            onClick={() => onSelectFile(file.filename)}
-            style={{
-              cursor: 'pointer',
-              padding: '6px 8px',
-              borderRadius: 4,
-              background: selectedFile === file.filename ? 'rgba(79,195,247,0.12)' : 'transparent',
-              border: 'none',
-              marginBottom: 2,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
-              {statusIcon[file.status]}
-              <span style={{
-                flex: 1,
-                fontSize: 12,
-                fontFamily: 'monospace',
-                color: selectedFile === file.filename ? '#4fc3f7' : '#ccc',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}>
-                {file.filename}
-              </span>
-              <span style={{ fontSize: 10, color: '#4caf50' }}>+{file.additions}</span>
-              <span style={{ fontSize: 10, color: '#ff5252' }}>-{file.deletions}</span>
-              {getRiskColor(file.filename) && (
+          <Tooltip key={file.filename} title={file.filename} placement="right" mouseEnterDelay={0.2}>
+            <List.Item
+              onClick={() => onSelectFile(file.filename)}
+              style={{
+                cursor: 'pointer',
+                padding: '6px 8px',
+                borderRadius: 4,
+                background: selectedFile === file.filename ? 'rgba(79,195,247,0.12)' : 'transparent',
+                border: 'none',
+                marginBottom: 2,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
+                {statusIcon[file.status]}
                 <span style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: '50%',
-                  backgroundColor: getRiskColor(file.filename),
-                  flexShrink: 0,
-                }} />
-              )}
-            </div>
-          </List.Item>
+                  flex: 1,
+                  fontSize: 12,
+                  fontFamily: 'monospace',
+                  color: selectedFile === file.filename ? '#4fc3f7' : '#ccc',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}>
+                  {file.filename}
+                </span>
+                <span style={{ fontSize: 10, color: '#4caf50' }}>+{file.additions}</span>
+                <span style={{ fontSize: 10, color: '#ff5252' }}>-{file.deletions}</span>
+                {getRiskColor(file.filename) && (
+                  <span style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    backgroundColor: getRiskColor(file.filename),
+                    flexShrink: 0,
+                  }} />
+                )}
+              </div>
+            </List.Item>
+          </Tooltip>
         )}
       />
     </div>
