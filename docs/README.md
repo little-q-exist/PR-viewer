@@ -36,7 +36,8 @@ PRviewer/
 | [frontend.md](./frontend.md) | 前端结构、路由、状态管理、页面 |
 | [api.md](./api.md) | REST API 端点说明 |
 | [database.md](./database.md) | 数据模型、索引、ER 关系 |
-| [testing.md](./testing.md) | 测试方案与当前结果 |
+| [testing.md](./testing.md) | 测试脚本、覆盖范围与尚未覆盖的场景 |
+| [submission-workflow.md](./submission-workflow.md) | 提交前验证、CI 流程与 PR 要求 |
 | [configuration.md](./configuration.md) | 环境变量、脚本、工具链 |
 | [git-workflow.md](./git-workflow.md) | 代码提交规范：commit 信息、分支命名、gh CLI 推送、PR 与合并流程 |
 | [current-status.md](./current-status.md) | 当前进度、已知问题与待办 |
