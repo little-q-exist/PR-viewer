@@ -61,43 +61,51 @@ export interface ParsedPrUrl {
   pullNumber: number;
 }
 
-// ========== Review / AI Analysis ==========
+// ========== Review / Findings ==========
 export type ReviewStatus = 'pending' | 'analyzing' | 'completed' | 'failed';
-export type RiskLevel = 'low' | 'medium' | 'high';
+export type ReviewEngine = 'ocr' | 'legacy';
 export type Category = 'security' | 'performance' | 'style' | 'logic' | 'maintainability';
 export type Severity = 'critical' | 'major' | 'minor' | 'nit';
-export type Priority = 'high' | 'medium' | 'low';
 
-export interface Recommendation {
-  priority: Priority;
-  category: Category;
-  title: string;
-  description: string;
-}
-
-export interface Summary {
-  riskLevel: RiskLevel;
-  score: number;
-  overview: string;
-  recommendations: Recommendation[];
-}
-
-export interface Suggestion {
-  lineStart: number;
-  lineEnd?: number;
+export interface Finding {
+  path: string;
+  content: string;
+  existingCode?: string;
+  suggestionCode?: string;
+  startLine: number;
+  endLine: number;
   category: Category;
   severity: Severity;
-  title: string;
-  description: string;
-  suggestionCode?: string;
+  rawCategory?: string;
+  rawSeverity?: string;
 }
 
-export interface FileAnalysis {
-  filename: string;
-  status: 'added' | 'modified' | 'removed';
-  riskLevel: RiskLevel;
-  summary: string;
-  suggestions: Suggestion[];
+export interface RunSummary {
+  filesReviewed: number;
+  comments: number;
+  totalTokens: number;
+  inputTokens: number;
+  outputTokens: number;
+  cacheReadTokens: number;
+  elapsed: string;
+}
+
+export interface ReviewLlm {
+  provider: string;
+  model: string;
+}
+
+export interface ToolCallsSummary {
+  total: number;
+  byTool: Record<string, number>;
+  failure: number;
+  failureByTool: Record<string, number>;
+  failureDetails: string[];
+}
+
+export interface ReviewGroup {
+  label: string;
+  files: string[];
 }
 
 export interface AiUsage {
@@ -108,8 +116,26 @@ export interface AiUsage {
   cost?: number;
 }
 
-export interface AnalyzerResult {
-  summary: Summary;
-  fileAnalyses: FileAnalysis[];
-  aiUsage: AiUsage;
+export interface Review {
+  _id: string;
+  userId: string;
+  prId: string;
+  engine: ReviewEngine;
+  engineVersion: string;
+  status: ReviewStatus;
+  engineStatus?: string;
+  llm?: ReviewLlm;
+  message?: string;
+  runSummary: RunSummary;
+  toolCalls?: ToolCallsSummary;
+  findings: Finding[];
+  groups: ReviewGroup[];
+  sessionId?: string;
+  warnings: string[];
+  aiUsage?: AiUsage;
+  errorMessage?: string;
+  startedAt?: Date;
+  completedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
