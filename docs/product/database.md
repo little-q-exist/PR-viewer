@@ -2,6 +2,8 @@
 
 数据库：MongoDB Atlas，通过 mongoose 9 访问，共三个集合：`User`、`PullRequest`、`Review`。
 
+> OCR 接入后的 `ReviewSession`、`ReviewTraceEvent` 和字段扩展属于规划模型，尚未实现。OCR 能力范围见 [phase-0-findings.md](../plan/phase-0/phase-0-findings.md)，目标模型与字段映射见 [ocr-integration.md](../plan/phase-1/ocr-integration.md)。
+
 ## ER 关系
 
 ```

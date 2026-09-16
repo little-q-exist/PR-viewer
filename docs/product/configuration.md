@@ -60,6 +60,6 @@
 
 ## Git 提交与分支规范
 
-代码提交规范（commit 信息、分支命名、gh CLI 推送、PR 与合并流程）已独立成文：[git-workflow.md](./git-workflow.md)。
+代码提交规范（commit 信息、分支命名、gh CLI 推送、PR 与合并流程）已独立成文：[git-workflow.md](../git-workflow.md)。
 
-提交前的本地验证与 CI 流程见 [submission-workflow.md](./submission-workflow.md)。
+提交前的本地验证与 CI 流程见 [submission-workflow.md](../submission-workflow.md)。

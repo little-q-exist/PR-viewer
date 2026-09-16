@@ -1,4 +1,6 @@
-先给结论：你的项目已经是一个**“PR 评审工作台”的好底子**（GitHub App OAuth + PR 数据拉取 + 异步任务 + Diff 前后对比 + 前端展示），但目前 `analyzerService.ts` 本质是**一次 LLM 调用 + 手工 JSON 解析**，还不是真正意义的 agent。简历上要“亮眼”，核心是把这条链路升级成**“确定性规则 + 可调用工具的 agent 循环 + 可评测”**，而这恰恰是现在几个开源项目已经趟过的路。
+> 本文是早期背景调研，具体阶段和执行约束以 [ocr-harness-roadmap.md](../ocr-harness-roadmap.md) 与 [../phase-1/ocr-integration.md](../phase-1/ocr-integration.md) 为准。
+
+先给结论：你的项目已经是一个**“PR 评审工作台”的好底子**（GitHub App OAuth + PR 数据拉取 + 异步任务 + Diff 前后对比 + 前端展示），但目前 `analyzerService.ts` 本质是**一次 LLM 调用 + 手工 JSON 解析**，还不是真正意义的 agent。简历上要“亮眼”，核心是把这条链路升级成**“确定性工程 + 可调用工具的 agent 循环 + 可评测”**，而这恰恰是现在几个开源项目已经趟过的路。
 
 你不需要推翻现有 React + Express + MongoDB 的骨架，我建议**保留自己全栈外壳，把“分析核心”换成/接入成熟开源 agent 引擎，再补 2~3 个差异化能力**。下面是联网查证后的可落地建议。
 
@@ -56,7 +58,7 @@
 
 在“接入开源引擎”之外，这几件事是**你简历里能讲出属于你自己的故事**的部分：
 
-- **P0 — 确定性规则引擎（1~2 天）**：在 LLM 之前先跑本地规则（secrets/密钥、危险函数、CI 权限、路径穿越、依赖漏洞版本号），结果作为“高置信度 findings”注入 agent，也单独展示。参考 grippy 的规则分类。
+- **P0 — 独立确定性规则引擎（1~2 天，暂不纳入当前 OCR 路线）**：在 LLM 之前先跑本地规则（secrets/密钥、危险函数、CI 权限、路径穿越、依赖漏洞版本号）。若后续实施，必须让 finding 自带稳定 `ruleId`，不能从 OCR comment 反推规则来源。参考 grippy 的规则分类。
 - **P0 — 自动回写 GitHub inline comments（2 天）**：复用你已有的 `@octokit/auth-app`，把 `fileAnalyses` 转成 `POST /repos/{owner}/{repo}/pulls/{n}/comments` 行级评论；这是“agent 项目”最直观的证据。
 - **P1 — 评测 harness（3 天）**：找 20~30 个真实 PR，人工标注 ground truth，算 Precision/Recall/F1 + token 成本。简历里“我用 200 个真实 PR 做了 benchmark”非常有分量，而且 OCR 已提供方法论，你可以直接对齐。
 - **P1 — 多模型适配层（1 天）**：把现在写死的 OpenAI Chat Completions 改成 OpenAI-compatible + Anthropic/Gemini/DeepSeek，可配置 baseURL。你现在已经有 `OPENAI_API_URL` 的雏形。
@@ -70,7 +72,7 @@
 | 周 | 目标 | 交付物 |
 |---|---|---|
 | W1 | 接入 OCR 引擎 + 保持现有前端不崩 | 后端多引擎适配层；`review` 返回结果格式统一；现有 36+27 测试继续通过 |
-| W2 | 规则引擎 + 自动回写 inline comments | GitHub App 写权限；PR 上能看到 bot 评论；规则命中展示在前端 |
+| W2 | OCR 元数据落库 + 自动回写 inline comments | GitHub App 写权限；PR 上能看到 bot 评论；文件级规则集元数据仅供后端解释，不参与 finding 来源归因 |
 | W3 | benchmark + README/文档 + 简历话术 | 一个评测脚本和报告；`docs` 补架构图；可对外展示的 demo 视频/GIF |
 
 ---
@@ -80,7 +82,7 @@
 建议别写成“改了个开源项目”，而是写成：
 
 - “基于开源评审引擎（Open Code Review）二次开发，自研 React/Express/MongoDB 评审工作台，接入 GitHub App OAuth 与异步任务队列”
-- “设计确定性安全规则引擎 + 工具调用型 agent 混合架构，实现行级精准评论与自动回写 GitHub PR”
+- “接入工具调用型 agent 架构，实现行级精准评论与自动回写 GitHub PR，并规划独立确定性规则引擎”
 - “构建真实 PR 评测集，量化 Precision/Recall/F1 与 token 成本，将单次 LLM 评审升级为可检索代码库的多步 agent”
 
 要不要我下一步直接帮你：**① 看 OCR 的 JSON 输出格式并写出后端适配层，或 ② 先做自动回写 GitHub inline comments？** 你告诉我优先做哪个，我直接在仓库里动手。
