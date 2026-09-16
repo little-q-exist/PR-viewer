@@ -1,13 +1,20 @@
 import { List, Badge, Tooltip } from 'antd';
 import { FileAddOutlined, FileTextOutlined, DeleteOutlined } from '@ant-design/icons';
-import type { FileInfo, FileAnalysis } from '@/types';
+import type { FileInfo, Finding, Severity } from '@/types';
 
 interface FileTreeProps {
   files: FileInfo[];
-  fileAnalyses: FileAnalysis[];
+  findings: Finding[];
   selectedFile: string | null;
   onSelectFile: (filename: string) => void;
 }
+
+const severityColor: Record<Severity, string> = {
+  critical: '#ff5252',
+  major: '#ff9800',
+  minor: '#ffc107',
+  nit: '#9e9e9e',
+};
 
 const statusIcon: Record<string, React.ReactNode> = {
   added: <FileAddOutlined style={{ color: '#4caf50' }} />,
@@ -15,13 +22,15 @@ const statusIcon: Record<string, React.ReactNode> = {
   removed: <DeleteOutlined style={{ color: '#ff5252' }} />,
 };
 
-export default function FileTree({ files, fileAnalyses, selectedFile, onSelectFile }: FileTreeProps) {
-  const getRiskColor = (filename: string) => {
-    const analysis = fileAnalyses.find((fa) => fa.filename === filename);
-    if (!analysis) return undefined;
-    if (analysis.riskLevel === 'high') return '#ff5252';
-    if (analysis.riskLevel === 'medium') return '#ff9800';
-    return '#4caf50';
+export default function FileTree({ files, findings, selectedFile, onSelectFile }: FileTreeProps) {
+  const getFindingColor = (filename: string) => {
+    const fileFindings = findings.filter((finding) => finding.path === filename);
+    if (fileFindings.length === 0) return undefined;
+    const severities: Severity[] = ['critical', 'major', 'minor', 'nit'];
+    const highest = severities.find((severity) =>
+      fileFindings.some((finding) => finding.severity === severity),
+    );
+    return highest ? severityColor[highest] : undefined;
   };
 
   const addedCount = files.filter((f) => f.status === 'added').length;
@@ -73,12 +82,12 @@ export default function FileTree({ files, fileAnalyses, selectedFile, onSelectFi
                 </span>
                 <span style={{ fontSize: 10, color: '#4caf50' }}>+{file.additions}</span>
                 <span style={{ fontSize: 10, color: '#ff5252' }}>-{file.deletions}</span>
-                {getRiskColor(file.filename) && (
+                {getFindingColor(file.filename) && (
                   <span style={{
                     width: 6,
                     height: 6,
                     borderRadius: '50%',
-                    backgroundColor: getRiskColor(file.filename),
+                    backgroundColor: getFindingColor(file.filename),
                     flexShrink: 0,
                   }} />
                 )}

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Col, Row, Empty } from 'antd';
-import type { Review, FileInfo, FileAnalysis } from '@/types';
+import type { Review, FileInfo } from '@/types';
 import FileTree from './FileTree';
 import DiffViewer from './DiffViewer';
+import FindingList from './FindingList';
 import ReviewComments from './ReviewComments';
 import { splitPatchIntoOldNew } from '../utils/splitPatch';
 
@@ -13,11 +14,10 @@ interface ChangesTabProps {
 export default function ChangesTab({ review }: ChangesTabProps) {
   const pr = typeof review.prId === 'object' ? review.prId : null;
   const files: FileInfo[] = pr?.files || [];
-  const fileAnalyses: FileAnalysis[] = review.fileAnalyses || [];
   const [selectedFile, setSelectedFile] = useState<string | null>(files[0]?.filename || null);
 
   const currentFile = files.find((f) => f.filename === selectedFile);
-  const currentAnalysis = fileAnalyses.find((fa) => fa.filename === selectedFile);
+  const fileFindings = review.findings.filter((finding) => finding.path === selectedFile);
   const fileComments = pr?.comments?.filter((c) => c.path === selectedFile) || [];
   const { oldCode, newCode } = currentFile
     ? splitPatchIntoOldNew(currentFile.patch)
@@ -46,7 +46,7 @@ export default function ChangesTab({ review }: ChangesTabProps) {
           </div>
           <FileTree
             files={files}
-            fileAnalyses={fileAnalyses}
+            findings={review.findings}
             selectedFile={selectedFile}
             onSelectFile={setSelectedFile}
           />
@@ -67,11 +67,8 @@ export default function ChangesTab({ review }: ChangesTabProps) {
               <div style={{ color: '#888', fontSize: 12, marginBottom: 12, fontFamily: 'monospace' }}>
                 {currentFile.filename}
               </div>
-              <DiffViewer
-                oldCode={oldCode}
-                newCode={newCode}
-                fileAnalysis={currentAnalysis}
-              />
+              <DiffViewer oldCode={oldCode} newCode={newCode} />
+              <FindingList findings={fileFindings} />
               <ReviewComments comments={fileComments} />
             </>
           ) : (

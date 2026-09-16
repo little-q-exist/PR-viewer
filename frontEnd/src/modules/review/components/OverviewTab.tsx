@@ -35,11 +35,7 @@ export default function OverviewTab({ review }: OverviewTabProps) {
         </div>
       </Col>
       <Col flex="auto">
-        {review.summary ? (
-          <AISummary summary={review.summary} />
-        ) : (
-          <div style={{ color: '#888', textAlign: 'center', padding: 60 }}>暂无 AI 分析结果</div>
-        )}
+        <AISummary review={review} />
       </Col>
     </Row>
   );

@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import FileTree from '../components/FileTree';
-import type { FileInfo, FileAnalysis } from '@/types';
+import type { FileInfo, Finding } from '@/types';
 
 const files: FileInfo[] = [
   {
@@ -24,20 +24,21 @@ const files: FileInfo[] = [
   },
 ];
 
-const fileAnalyses: FileAnalysis[] = [
+const findings: Finding[] = [
   {
-    filename: 'src/a.ts',
-    status: 'modified',
-    riskLevel: 'high',
-    summary: 'risky change',
-    suggestions: [],
+    path: 'src/a.ts',
+    content: 'risky change',
+    startLine: 1,
+    endLine: 1,
+    category: 'logic',
+    severity: 'critical',
   },
 ];
 
 describe('FileTree', () => {
   it('should render filenames with additions/deletions', () => {
     render(
-      <FileTree files={files} fileAnalyses={fileAnalyses} selectedFile={null} onSelectFile={vi.fn()} />,
+      <FileTree files={files} findings={findings} selectedFile={null} onSelectFile={vi.fn()} />,
     );
 
     expect(screen.getByText('src/a.ts')).toBeInTheDocument();
@@ -47,22 +48,21 @@ describe('FileTree', () => {
     expect(screen.getByText('+5')).toBeInTheDocument();
   });
 
-  it('should render a risk dot when the file has a high-risk analysis', () => {
+  it('should render a severity dot when the file has findings', () => {
     const { container } = render(
-      <FileTree files={files} fileAnalyses={fileAnalyses} selectedFile={null} onSelectFile={vi.fn()} />,
+      <FileTree files={files} findings={findings} selectedFile={null} onSelectFile={vi.fn()} />,
     );
 
-    // 高风险的 a.ts 显示风险点；b.ts 无分析不显示
-    const riskDots = container.querySelectorAll('span[style*="background-color"]');
-    expect(riskDots.length).toBe(1);
-    expect((riskDots[0] as HTMLElement).style.backgroundColor).toBe('rgb(255, 82, 82)');
+    const dots = container.querySelectorAll('span[style*="background-color"]');
+    expect(dots.length).toBe(1);
+    expect((dots[0] as HTMLElement).style.backgroundColor).toBe('rgb(255, 82, 82)');
   });
 
   it('should call onSelectFile with the filename on click', async () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
     render(
-      <FileTree files={files} fileAnalyses={fileAnalyses} selectedFile={null} onSelectFile={onSelect} />,
+      <FileTree files={files} findings={findings} selectedFile={null} onSelectFile={onSelect} />,
     );
 
     await user.click(screen.getByText('src/b.ts'));
@@ -75,7 +75,7 @@ describe('FileTree', () => {
     render(
       <FileTree
         files={[{ ...files[0], filename }]}
-        fileAnalyses={[]}
+        findings={[]}
         selectedFile={null}
         onSelectFile={vi.fn()}
       />,

@@ -7,7 +7,15 @@ import RecentReviews from './RecentReviews';
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { totalCount, highRiskCount, mediumRiskCount, lowRiskCount, recentReviews, isLoading, error } = useDashboard();
+  const {
+    totalCount,
+    recentCompletedCount,
+    recentFindingCount,
+    recentTokenCount,
+    recentReviews,
+    isLoading,
+    error,
+  } = useDashboard();
 
   return (
     <div style={{ maxWidth: 960, margin: '0 auto' }}>
@@ -19,9 +27,9 @@ export default function Dashboard() {
 
       <StatsCards
         totalCount={totalCount}
-        highRiskCount={highRiskCount}
-        mediumRiskCount={mediumRiskCount}
-        lowRiskCount={lowRiskCount}
+        recentCompletedCount={recentCompletedCount}
+        recentFindingCount={recentFindingCount}
+        recentTokenCount={recentTokenCount}
         isLoading={isLoading}
       />
 

@@ -16,12 +16,6 @@ const statusConfig: Record<string, { color: string; icon: React.ReactNode; label
   pending: { color: 'default', icon: <ClockCircleOutlined />, label: '等待中' },
 };
 
-const riskConfig: Record<string, { color: string; label: string }> = {
-  high: { color: 'red', label: '高风险' },
-  medium: { color: 'orange', label: '中风险' },
-  low: { color: 'green', label: '低风险' },
-};
-
 interface ReviewTableProps {
   reviews: Review[];
   isLoading: boolean;
@@ -56,23 +50,27 @@ export default function ReviewTable({ reviews, isLoading, page, total, onPageCha
       },
     },
     {
-      title: '风险',
-      key: 'risk',
-      width: 90,
+      title: '引擎',
+      key: 'engine',
+      width: 100,
       render: (_: unknown, record: Review) => {
-        if (!record.summary) return <span style={{ color: '#666' }}>—</span>;
-        const cfg = riskConfig[record.summary.riskLevel];
-        return <Tag color={cfg?.color}>{cfg?.label}</Tag>;
+        return <Tag>{record.engine}</Tag>;
       },
     },
     {
-      title: '评分',
-      key: 'score',
-      width: 80,
+      title: '发现问题',
+      key: 'findings',
+      width: 100,
       render: (_: unknown, record: Review) => {
-        if (!record.summary) return <span style={{ color: '#666' }}>—</span>;
-        const color = record.summary.score >= 80 ? '#4caf50' : record.summary.score >= 60 ? '#ff9800' : '#ff5252';
-        return <span style={{ color, fontWeight: 700, fontSize: 15 }}>{record.summary.score}</span>;
+        return <span style={{ color: '#e0e0e0', fontWeight: 700 }}>{record.runSummary.comments}</span>;
+      },
+    },
+    {
+      title: '耗时',
+      key: 'elapsed',
+      width: 90,
+      render: (_: unknown, record: Review) => {
+        return <span style={{ color: '#aaa' }}>{record.runSummary.elapsed || '—'}</span>;
       },
     },
     {

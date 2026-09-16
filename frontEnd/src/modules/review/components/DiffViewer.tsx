@@ -1,7 +1,4 @@
 import ReactDiffViewerModule, { DiffMethod } from 'react-diff-viewer';
-import { List } from 'antd';
-import type { FileAnalysis, Suggestion } from '@/types';
-import SuggestionPopover from './SuggestionPopover';
 
 // react-diff-viewer 是纯 CJS 的旧库：`__esModule = true`，真正的组件挂在 `exports.default`。
 // Vite 8 在 dev 下按 esbuild/Node 语义预打包 CJS 依赖，默认导出是整个 `module.exports`
@@ -25,10 +22,9 @@ const ReactDiffViewerComponent = resolveReactDiffViewerComponent(
 interface DiffViewerProps {
   oldCode: string;
   newCode: string;
-  fileAnalysis?: FileAnalysis;
 }
 
-export default function DiffViewer({ oldCode, newCode, fileAnalysis }: DiffViewerProps) {
+export default function DiffViewer({ oldCode, newCode }: DiffViewerProps) {
   return (
     <div>
       <ReactDiffViewerComponent
@@ -51,29 +47,6 @@ export default function DiffViewer({ oldCode, newCode, fileAnalysis }: DiffViewe
           },
         }}
       />
-      {fileAnalysis && fileAnalysis.suggestions.length > 0 && (
-        <div style={{
-          marginTop: 16,
-          background: 'rgba(255,255,255,0.03)',
-          borderRadius: 8,
-          border: '1px solid rgba(255,255,255,0.06)',
-          padding: 12,
-        }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#aaa', marginBottom: 10 }}>
-            AI 建议 ({fileAnalysis.suggestions.length})
-          </div>
-          <List
-            size="small"
-            dataSource={fileAnalysis.suggestions}
-            split={false}
-            renderItem={(suggestion: Suggestion) => (
-              <List.Item style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', padding: '8px 0' }}>
-                <SuggestionPopover suggestion={suggestion} />
-              </List.Item>
-            )}
-          />
-        </div>
-      )}
     </div>
   );
 }
