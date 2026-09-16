@@ -24,6 +24,16 @@ PRviewer/
 │       ├── store/           # Redux Toolkit（auth / ui）
 │       └── types/           # 前端类型定义
 ├── docs/                    # 项目文档（本目录）
+│   ├── README.md            # 文档入口与索引
+│   ├── git-workflow.md      # Git 提交规范与协作流程
+│   ├── submission-workflow.md # 提交前验证与 CI 要求
+│   ├── product/             # 产品与实现现状文档
+│   └── plan/                # OCR 迁移与 harness 升级计划
+│       ├── README.md
+│       ├── ocr-harness-roadmap.md
+│       ├── phase-0/         # OCR 基线与接入设计
+│       ├── phase-1/         # 部署、工作区与 OCR 数据模型设计
+│       └── achieved/        # 已完成调研
 ├── AGENTS.md                # 项目级约定（入口：先阅读 docs/README.md）
 └── package.json             # 根目录：concurrently 并行启动前后端
 ```
@@ -32,18 +42,19 @@ PRviewer/
 
 | 文档 | 内容 |
 |------|------|
-| [architecture.md](./architecture.md) | 总体架构、技术栈、数据流、缓存策略 |
-| [backend.md](./backend.md) | 后端结构、模块职责、关键实现 |
-| [frontend.md](./frontend.md) | 前端结构、路由、状态管理、页面 |
-| [api.md](./api.md) | REST API 端点说明 |
-| [database.md](./database.md) | 数据模型、索引、ER 关系 |
-| [testing.md](./testing.md) | 测试脚本、覆盖范围与尚未覆盖的场景 |
+| [product/architecture.md](./product/architecture.md) | 总体架构、技术栈、数据流、缓存策略 |
+| [product/backend.md](./product/backend.md) | 后端结构、模块职责、关键实现 |
+| [product/frontend.md](./product/frontend.md) | 前端结构、路由、状态管理、页面 |
+| [product/api.md](./product/api.md) | REST API 端点说明 |
+| [product/database.md](./product/database.md) | 数据模型、索引、ER 关系 |
+| [product/testing.md](./product/testing.md) | 测试脚本、覆盖范围与尚未覆盖的场景 |
 | [submission-workflow.md](./submission-workflow.md) | 提交前验证、CI 流程与 PR 要求 |
-| [configuration.md](./configuration.md) | 环境变量、脚本、工具链 |
+| [product/configuration.md](./product/configuration.md) | 环境变量、脚本、工具链 |
 | [git-workflow.md](./git-workflow.md) | 代码提交规范：commit 信息、分支命名、gh CLI 推送、PR 与合并流程 |
-| [current-status.md](./current-status.md) | 当前进度、已知问题与待办 |
+| [product/current-status.md](./product/current-status.md) | 当前进度、已知问题与待办 |
 | [plan/README.md](./plan/README.md) | 升级为 harness agent 的开发计划（OCR 路线） |
-| [plan/phase-0-findings.md](./plan/phase-0-findings.md) | OCR 基线验证结果、JSON 契约与接入决策 |
+| [plan/phase-0/phase-0-findings.md](./plan/phase-0/phase-0-findings.md) | OCR 基线验证结果、能力范围与 JSON 契约 |
+| [plan/phase-1/ocr-integration.md](./plan/phase-1/ocr-integration.md) | OCR 外部契约、目标领域模型与字段映射设计 |
 | [product/flow.md](./product/flow.md) | PR 输入 → AI 建议 的端到端业务流程 |
 
 ## 快速开始
@@ -97,4 +108,4 @@ spawn(process.execPath, [ocrEntry, ...args], {
 });
 ```
 
-Windows 下必须保证 `%USERPROFILE%\.opencodereview` 可写，否则 OCR 会话持久化会失败。完整 JSON 契约、session/trace 结构与子进程验证结论见 [phase-0-findings.md](./plan/phase-0-findings.md)。
+Windows 下必须保证 `%USERPROFILE%\.opencodereview` 可写，否则 OCR 会话持久化会失败。OCR 能力范围、JSON 契约与子进程验证结论见 [phase-0-findings.md](./plan/phase-0/phase-0-findings.md)，数据模型与字段映射设计见 [plan/phase-1/ocr-integration.md](./plan/phase-1/ocr-integration.md)。

@@ -6,7 +6,7 @@
 ## 一句话决策
 
 - **底座**：采用 [alibaba/open-code-review](https://github.com/alibaba/open-code-review)（OCR，Apache-2.0）作为评审引擎，因为它已经实现了“确定性工程 × Agent 混合架构”、工具调用循环、行级定位与反思、评测基准，与我们目标完全重合。
-- **改造方式**：保留现有 React 19 + Express 5 + MongoDB 的全栈骨架，不重写；只把 `analyzerService` 背后的“单次 LLM 调用”替换为“OCR 引擎适配层”，再补规则落库、状态机、回写 GitHub、评测 harness。
+- **改造方式**：保留现有 React 19 + Express 5 + MongoDB 的全栈骨架，不重写；只把 `analyzerService` 背后的“单次 LLM 调用”替换为“OCR 引擎适配层”，再补 OCR 元数据落库、状态机、回写 GitHub、评测 harness。
 - **快速开发约束**：每个阶段都可独立交付、可回滚、有验收标准，优先做“简历可见、工作量小”的能力。
 
 ## 文档清单
@@ -14,8 +14,10 @@
 | 文档 | 内容 |
 |------|------|
 | [ocr-harness-roadmap.md](./ocr-harness-roadmap.md) | 主计划：目标架构、阶段划分、开发先后顺序、验收标准、风险 |
-| [agent-refactor.md](./agent-refactor.md) | 早前的背景调研与候选开源项目对比（保留作决策依据） |
-| [deployment-and-workspace.md](./deployment-and-workspace.md) | 部署与工作区设计：临时 clone 放哪、前端/后端/OCR 如何访问 |
+| [phase-1/ocr-integration.md](./phase-1/ocr-integration.md) | OCR 外部契约、目标领域模型与字段映射设计 |
+| [phase-0/phase-0-findings.md](./phase-0/phase-0-findings.md) | OCR 基线验证结果、能力范围与 JSON 契约 |
+| [phase-1/deployment-and-workspace.md](./phase-1/deployment-and-workspace.md) | 部署与工作区设计：临时 clone 放哪、前端/后端/OCR 如何访问 |
+| [achieved/agent-refactor.md](./achieved/agent-refactor.md) | 早前的背景调研与候选开源项目对比（保留作决策依据） |
 
 ## 目标能力清单（7 项）
 
@@ -23,7 +25,7 @@
 2. 工具调用循环（tool-use loop）
 3. 工具注册表（tool registry）
 4. 步骤级状态机与持久化（state machine）
-5. 确定性工程约束（deterministic guardrails / 规则引擎）
+5. 确定性工程约束（文件筛选、规则集匹配、行号校验）
 6. 可观测性（observability / trace）
 7. 评测 harness（eval）
 

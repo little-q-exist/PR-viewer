@@ -1,6 +1,6 @@
 # 部署与工作区设计：临时 clone 放哪、谁访问它
 
-> 本文是对 [ocr-harness-roadmap.md](./ocr-harness-roadmap.md) 阶段 1「仓库物化」的补充说明，
+> 本文是对 [ocr-harness-roadmap.md](../ocr-harness-roadmap.md) 阶段 1「仓库物化」的补充说明，
 > 回答两个问题：
 > 1. 评审用的临时 Git 工作区保存在哪里？
 > 2. 未来部署上线后，如何把仓库拉到后端进程所在的机器，并兼顾前端展示、后端与 OCR 访问？
