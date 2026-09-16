@@ -1,7 +1,10 @@
 // Mock ESM-only packages and app-level infrastructure so we can exercise the
 // real Express app (routes + controllers) via supertest without a server/DB.
 jest.mock('octokit', () => ({ Octokit: jest.fn() }));
-jest.mock('@octokit/auth-app', () => ({ createOAuthUserAuth: jest.fn() }));
+jest.mock('@octokit/auth-app', () => ({
+  createAppAuth: jest.fn(),
+  createOAuthUserAuth: jest.fn(),
+}));
 
 jest.mock('../../../shared/middleware/rateLimiter', () => ({
   apiLimiter: jest.fn((_req: unknown, _res: unknown, next: () => void) => next()),

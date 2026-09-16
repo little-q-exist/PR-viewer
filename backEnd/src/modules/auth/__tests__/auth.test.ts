@@ -2,10 +2,12 @@ import jwt from 'jsonwebtoken';
 
 // Mock ESM-only @octokit/auth-app to avoid Jest transform errors
 jest.mock('@octokit/auth-app', () => ({
+  createAppAuth: jest.fn(),
   createOAuthUserAuth: jest.fn(),
 }));
 
-import { generateToken, verifyToken } from '../services/authService';
+import { createAppAuth } from '@octokit/auth-app';
+import { generateToken, getInstallationToken, verifyToken } from '../services/authService';
 
 describe('AuthService', () => {
   const originalEnv = process.env;
@@ -46,6 +48,30 @@ describe('AuthService', () => {
     it('should return null for an invalid token', () => {
       const result = verifyToken('invalid-token');
       expect(result).toBeNull();
+    });
+  });
+
+  describe('getInstallationToken', () => {
+    it('creates an installation token without persisting credentials', async () => {
+      process.env.GITHUB_APP_ID = '123';
+      process.env.GITHUB_APP_PRIVATE_KEY = 'line-1\\nline-2';
+      const auth = jest.fn().mockResolvedValue({ token: 'installation-token' });
+      (createAppAuth as jest.Mock).mockReturnValue(auth);
+
+      await expect(getInstallationToken(456)).resolves.toBe('installation-token');
+      expect(createAppAuth).toHaveBeenCalledWith({
+        appId: 123,
+        privateKey: 'line-1\nline-2',
+        installationId: 456,
+      });
+      expect(auth).toHaveBeenCalledWith({ type: 'installation' });
+    });
+
+    it('rejects invalid installation IDs', async () => {
+      process.env.GITHUB_APP_ID = '123';
+      process.env.GITHUB_APP_PRIVATE_KEY = 'private-key';
+
+      await expect(getInstallationToken(0)).rejects.toThrow('Invalid GitHub App installation ID');
     });
   });
 });
