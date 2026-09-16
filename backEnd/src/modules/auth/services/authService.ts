@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import type { StringValue } from 'ms';
 import type { JwtPayload } from '../../../shared/types';
-import { createOAuthUserAuth } from '@octokit/auth-app';
+import { createAppAuth, createOAuthUserAuth } from '@octokit/auth-app';
 import { User } from '../models/User';
 
 export function generateToken(userId: string, githubId: number): string {
@@ -82,5 +82,28 @@ export async function getValidAccessToken(userId: string): Promise<string> {
   }
   await user.save();
 
+  return result.token;
+}
+
+export async function getInstallationToken(installationId: number): Promise<string> {
+  const appId = Number(process.env.GITHUB_APP_ID);
+  const privateKey = process.env.GITHUB_APP_PRIVATE_KEY?.replace(/\\n/g, '\n');
+
+  if (!Number.isSafeInteger(appId) || appId <= 0) {
+    throw new Error('GITHUB_APP_ID is not configured');
+  }
+  if (!privateKey) {
+    throw new Error('GITHUB_APP_PRIVATE_KEY is not configured');
+  }
+  if (!Number.isSafeInteger(installationId) || installationId <= 0) {
+    throw new Error('Invalid GitHub App installation ID');
+  }
+
+  const auth = createAppAuth({
+    appId,
+    privateKey,
+    installationId,
+  });
+  const result = await auth({ type: 'installation' });
   return result.token;
 }

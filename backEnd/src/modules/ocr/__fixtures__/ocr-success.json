@@ -1,0 +1,66 @@
+{
+  "status": "complete",
+  "llm": {
+    "provider": "custom-provider",
+    "model": "model-name"
+  },
+  "message": "Review complete: 2 finding(s) across 1 selected item(s).",
+  "summary": {
+    "files_reviewed": 1,
+    "comments": 2,
+    "total_tokens": 61434,
+    "input_tokens": 55430,
+    "output_tokens": 6004,
+    "cache_read_tokens": 39424,
+    "elapsed": "32s"
+  },
+  "tool_calls": {
+    "total": 12,
+    "by_tool": {
+      "code_comment": 1,
+      "code_search": 6
+    },
+    "failure": 1,
+    "failure_by_tool": {
+      "code_search": 1
+    },
+    "failure_details": [
+      {
+        "tool": "code_search",
+        "error": "not found"
+      }
+    ]
+  },
+  "comments": [
+    {
+      "path": "src/a.ts",
+      "content": "Potential logic bug",
+      "existing_code": "if (value)",
+      "start_line": 4,
+      "end_line": 4,
+      "category": "bug",
+      "severity": "medium",
+      "thinking": "private reasoning that must not persist"
+    },
+    {
+      "path": "src/b.ts",
+      "content": "Consider simplifying this branch",
+      "suggestion_code": "return value;",
+      "existing_code": "if (value) return value;",
+      "start_line": 8,
+      "end_line": 9,
+      "category": "maintainability",
+      "severity": "low"
+    }
+  ],
+  "groups": [
+    {
+      "label": "source",
+      "files": ["src/a.ts", "src/b.ts"]
+    }
+  ],
+  "session_id": "session-123",
+  "manifest": {
+    "review_mode": "branch"
+  }
+}

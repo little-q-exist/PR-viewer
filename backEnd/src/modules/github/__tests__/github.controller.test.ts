@@ -1,7 +1,10 @@
 // Controller-level tests via the real Express app; all external dependencies
 // (octokit, auth, rate limiter, models, services) are mocked.
 jest.mock('octokit', () => ({ Octokit: jest.fn() }));
-jest.mock('@octokit/auth-app', () => ({ createOAuthUserAuth: jest.fn() }));
+jest.mock('@octokit/auth-app', () => ({
+  createAppAuth: jest.fn(),
+  createOAuthUserAuth: jest.fn(),
+}));
 
 jest.mock('../../../shared/middleware/rateLimiter', () => ({
   apiLimiter: jest.fn((_req: unknown, _res: unknown, next: () => void) => next()),
