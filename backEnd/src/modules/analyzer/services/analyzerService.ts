@@ -1,5 +1,6 @@
 import axios from 'axios';
-import type { FileInfo, AnalyzerResult } from '../../../shared/types';
+import type { FileInfo } from '../../../shared/types';
+import type { LegacyAnalyzerResult } from '../types';
 
 export function buildAnalyzerPrompt(
     prTitle: string,
@@ -81,7 +82,7 @@ Be specific — reference exact line numbers from the diff.`;
 
 export function parseAnalyzerResponse(
     response: string,
-): Omit<AnalyzerResult, 'aiUsage'> {
+): Omit<LegacyAnalyzerResult, 'aiUsage'> {
     let cleaned = response.trim();
 
     const jsonMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -96,7 +97,7 @@ export function parseAnalyzerResponse(
             throw new Error('Missing required fields in AI response');
         }
 
-        return parsed as Omit<AnalyzerResult, 'aiUsage'>;
+        return parsed as Omit<LegacyAnalyzerResult, 'aiUsage'>;
     } catch (error) {
         if (error instanceof SyntaxError) {
             throw new Error('Failed to parse AI response: invalid JSON');
@@ -110,7 +111,7 @@ export async function analyzePullRequest(
     prBody: string | null,
     files: FileInfo[],
     diff: string,
-): Promise<AnalyzerResult> {
+): Promise<LegacyAnalyzerResult> {
     const apiUrl = process.env.OPENAI_API_URL;
     const apiKey = process.env.OPENAI_API_KEY;
     const model = process.env.OPENAI_MODEL;
