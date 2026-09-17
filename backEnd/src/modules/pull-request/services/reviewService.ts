@@ -1,15 +1,23 @@
 import { Review } from '../models/Review';
 import { PullRequest } from '../../github/models/PullRequest';
 import { analyzePullRequest } from '../../analyzer/services/analyzerService';
+import { adaptLegacyAnalyzerResult } from '../../analyzer/services/legacyReviewAdapter';
 import type { IReview } from '../models/Review';
-import type { AnalyzerResult } from '../../../shared/types';
+
+const REVIEW_ENGINE = 'legacy' as const;
+const REVIEW_ENGINE_VERSION = 'analyzer-v1';
 
 export async function createReview(userId: string, prId: string): Promise<IReview> {
   const review = await Review.create({
     userId,
     prId,
+    engine: REVIEW_ENGINE,
+    engineVersion: REVIEW_ENGINE_VERSION,
     status: 'pending' as const,
-    fileAnalyses: [],
+    runSummary: {},
+    findings: [],
+    groups: [],
+    warnings: [],
   });
   return review;
 }
@@ -46,7 +54,7 @@ export async function listReviews(
       .skip((page - 1) * limit)
       .limit(limit)
       .populate('prId', 'title url owner repo pullNumber state')
-      .select('-fileAnalyses')
+      .select('-findings')
       .lean(),
     Review.countDocuments(query),
   ]);
@@ -73,16 +81,26 @@ export async function processReview(reviewId: string, accessToken: string): Prom
       throw new Error('Pull request not found');
     }
 
-    const result: AnalyzerResult = await analyzePullRequest(
+    const result = await analyzePullRequest(
       pr.title,
       pr.body ?? null,
       pr.files,
       pr.diff,
     );
+    const adapted = adaptLegacyAnalyzerResult(result);
 
-    review.summary = result.summary;
-    review.fileAnalyses = result.fileAnalyses;
-    review.aiUsage = result.aiUsage;
+    review.engine = adapted.engine;
+    review.engineVersion = adapted.engineVersion;
+    review.engineStatus = adapted.engineStatus;
+    review.llm = adapted.llm;
+    review.message = undefined;
+    review.runSummary = adapted.runSummary;
+    review.toolCalls = undefined;
+    review.findings = adapted.findings;
+    review.groups = adapted.groups;
+    review.sessionId = undefined;
+    review.warnings = adapted.warnings;
+    review.aiUsage = adapted.aiUsage;
     review.status = 'completed';
     review.completedAt = new Date();
     await review.save();

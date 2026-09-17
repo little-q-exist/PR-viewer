@@ -17,12 +17,6 @@ const statusConfig: Record<string, { color: string; icon: React.ReactNode; label
   pending: { color: 'default', icon: <ClockCircleOutlined />, label: '等待中' },
 };
 
-const riskConfig: Record<string, { color: string; label: string }> = {
-  high: { color: 'red', label: '高风险' },
-  medium: { color: 'orange', label: '中风险' },
-  low: { color: 'green', label: '低风险' },
-};
-
 interface RecentReviewsProps {
   reviews: Review[];
   isLoading: boolean;
@@ -62,7 +56,6 @@ export default function RecentReviews({ reviews, isLoading }: RecentReviewsProps
           renderItem={(review) => {
             const pr = typeof review.prId === 'object' ? review.prId : null;
             const status = statusConfig[review.status] || statusConfig.pending;
-            const risk = review.summary ? riskConfig[review.summary.riskLevel] : null;
 
             return (
               <List.Item
@@ -74,12 +67,10 @@ export default function RecentReviews({ reviews, isLoading }: RecentReviewsProps
                   description={
                     <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 4 }}>
                       <Tag color={status.color} icon={status.icon}>{status.label}</Tag>
-                      {risk && <Tag color={risk.color}>{risk.label}</Tag>}
-                      {review.summary && (
-                        <Text style={{ color: risk?.color, fontWeight: 700, fontSize: 13 }}>
-                          {review.summary.score}/100
-                        </Text>
-                      )}
+                      <Tag>{review.engine}</Tag>
+                      <Text style={{ color: '#aaa', fontSize: 12 }}>
+                        发现 {review.runSummary.comments} 项
+                      </Text>
                     </div>
                   }
                 />

@@ -1,9 +1,7 @@
-import { Popover, Tag, Typography } from 'antd';
+import { Popover, Tag } from 'antd';
 import { MessageOutlined } from '@ant-design/icons';
-import type { Suggestion } from '@/types';
+import type { Finding } from '@/types';
 import MarkdownContent from '@/shared/components/MarkdownContent';
-
-const { Text } = Typography;
 
 const severityConfig: Record<string, { color: string; label: string }> = {
   critical: { color: '#ff5252', label: '严重' },
@@ -12,27 +10,24 @@ const severityConfig: Record<string, { color: string; label: string }> = {
   nit: { color: '#9e9e9e', label: '建议' },
 };
 
-interface SuggestionPopoverProps {
-  suggestion: Suggestion;
+interface FindingPopoverProps {
+  finding: Finding;
 }
 
-export default function SuggestionPopover({ suggestion }: SuggestionPopoverProps) {
-  const sev = severityConfig[suggestion.severity] || severityConfig.nit;
+export default function FindingPopover({ finding }: FindingPopoverProps) {
+  const severity = severityConfig[finding.severity] ?? severityConfig.nit;
 
   const popoverContent = (
     <div style={{ maxWidth: 400 }}>
       <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
-        <Tag color={sev.color}>{sev.label}</Tag>
-        <Tag>{suggestion.category}</Tag>
+        <Tag color={severity.color}>{severity.label}</Tag>
+        <Tag>{finding.category}</Tag>
       </div>
-      <Text strong style={{ color: '#e0e0e0', display: 'block', marginBottom: 8 }}>
-        {suggestion.title}
-      </Text>
       <MarkdownContent
-        content={suggestion.description}
+        content={finding.content}
         style={{ color: 'rgba(255,255,255,0.75)', fontSize: 13, lineHeight: 1.6 }}
       />
-      {suggestion.suggestionCode && (
+      {finding.suggestionCode && (
         <pre style={{
           background: 'rgba(0,0,0,0.3)',
           borderRadius: 6,
@@ -44,7 +39,7 @@ export default function SuggestionPopover({ suggestion }: SuggestionPopoverProps
           fontFamily: 'monospace',
           whiteSpace: 'pre-wrap',
         }}>
-          {suggestion.suggestionCode}
+          {finding.suggestionCode}
         </pre>
       )}
     </div>
@@ -66,13 +61,14 @@ export default function SuggestionPopover({ suggestion }: SuggestionPopoverProps
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', width: '100%' }}>
         <MessageOutlined style={{ color: '#ff9800', fontSize: 14, flexShrink: 0 }} />
-        <div>
+        <div style={{ minWidth: 0 }}>
           <div style={{ color: '#e0e0e0', fontSize: 13, fontWeight: 500 }}>
-            <Tag color={sev.color} style={{ marginRight: 6 }}>{sev.label}</Tag>
-            {suggestion.title}
+            <Tag color={severity.color} style={{ marginRight: 6 }}>{severity.label}</Tag>
+            {finding.content.slice(0, 80)}
+            {finding.content.length > 80 ? '...' : ''}
           </div>
           <div style={{ color: '#888', fontSize: 11, marginTop: 2 }}>
-            第 {suggestion.lineStart}{suggestion.lineEnd ? `-${suggestion.lineEnd}` : ''} 行 · {suggestion.category}
+            第 {finding.startLine}-{finding.endLine} 行 · {finding.category}
           </div>
         </div>
       </div>
