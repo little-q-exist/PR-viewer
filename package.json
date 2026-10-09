@@ -10,6 +10,6 @@
         "validate": "npm run validate:frontend && npm run validate:backend && npm run audit:prod"
     },
     "devDependencies": {
-        "concurrently": "^9.2.1"
+        "concurrently": "^9.2.5"
     }
 }
