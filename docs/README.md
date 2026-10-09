@@ -32,7 +32,7 @@ PRviewer/
 │       ├── README.md
 │       ├── ocr-harness-roadmap.md
 │       ├── phase-0/         # OCR 基线与接入设计
-│       ├── phase-1/         # 部署、工作区与 OCR 数据模型设计
+│       ├── phase-1/         # OCR 数据模型、runner、错误映射与工作区设计
 │       └── achieved/        # 已完成调研
 ├── AGENTS.md                # 项目级约定（入口：先阅读 docs/README.md）
 └── package.json             # 根目录：concurrently 并行启动前后端
@@ -55,6 +55,8 @@ PRviewer/
 | [plan/README.md](./plan/README.md) | 升级为 harness agent 的开发计划（OCR 路线） |
 | [plan/phase-0/phase-0-findings.md](./plan/phase-0/phase-0-findings.md) | OCR 基线验证结果、能力范围与 JSON 契约 |
 | [plan/phase-1/ocr-integration.md](./plan/phase-1/ocr-integration.md) | OCR 外部契约、目标领域模型与字段映射设计 |
+| [plan/phase-1/ocr-cli-runner.md](./plan/phase-1/ocr-cli-runner.md) | OCR CLI 入口解析、进程调用、超时、输出与安全边界 |
+| [plan/phase-1/error-mapping.md](./plan/phase-1/error-mapping.md) | 同步/异步错误契约、Review 错误字段与 HTTP 映射 |
 | [product/flow.md](./product/flow.md) | PR 输入 → AI 建议 的端到端业务流程 |
 
 ## 快速开始
