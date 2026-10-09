@@ -15,6 +15,8 @@
 |------|------|
 | [ocr-harness-roadmap.md](./ocr-harness-roadmap.md) | 主计划：目标架构、阶段划分、开发先后顺序、验收标准、风险 |
 | [phase-1/ocr-integration.md](./phase-1/ocr-integration.md) | OCR 外部契约、目标领域模型与字段映射设计 |
+| [phase-1/ocr-cli-runner.md](./phase-1/ocr-cli-runner.md) | OCR CLI 入口解析、进程调用、超时、输出与安全边界 |
+| [phase-1/error-mapping.md](./phase-1/error-mapping.md) | 同步/异步错误契约、Review 错误字段与 HTTP 映射 |
 | [phase-0/phase-0-findings.md](./phase-0/phase-0-findings.md) | OCR 基线验证结果、能力范围与 JSON 契约 |
 | [phase-1/deployment-and-workspace.md](./phase-1/deployment-and-workspace.md) | 部署与工作区设计：临时 clone 放哪、前端/后端/OCR 如何访问 |
 | [achieved/agent-refactor.md](./achieved/agent-refactor.md) | 早前的背景调研与候选开源项目对比（保留作决策依据） |
